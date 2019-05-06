@@ -1,55 +1,40 @@
 from person import Person 
 
-from users import users
+from users import Users
 from keyboards import keyboards
+from messages import GREETING, GREETING_NEW, TALLY, LUNCH
 
 def start(update, context):
     userid = update.message.from_user.id
-    if (userid in users):
-        user = users[userid]
+    if (userid in Users()):
+        user = Users()[userid]
         update.message.reply_text(
-            text="You are already using lotterylunchbot"
+            text=GREETING.format(user.first_name)
         )
     else:
         user = Person(update.message.from_user)
-        users[userid] = user
+        Users()[userid] = user
         update.message.reply_text(
-            text="You seem to be a new user!\nPlease fill this basic information."
+            text=GREETING_NEW.format(user.first_name)
         )
-    update.message.reply_text('Please choose:', reply_markup=keyboards["HOME"])
-    return "SCHOOL"
 
-def startMenu(update, context):
-    user = users[update.callback_query.message.chat.id]
-    query = update.callback_query
-    return query.data
+def count(update, context):
+    update.message.reply_text(
+        text=TALLY.format(len(Users()))
+    )
 
-def setSchool(update, context):
-    user = users[update.callback_query.message.chat.id]
-    query = update.callback_query
+def raffle_pairs(context):
+    for a, b in Users().get_pairs():
+        if (a == None or b == None):
+            try:
+                context.bot.send_message(chat_id=a,
+                    text='Sorry, you were the odd one out today :(')
+            except:
+                context.bot.send_message(chat_id=b,
+                    text='Sorry, you were the odd one out today :(')
+        else:
+            context.bot.send_message(chat_id=a, 
+                text=LUNCH.format(Users()[b].username))
+            context.bot.send_message(chat_id=b, 
+                text=LUNCH.format(Users()[a].username))
 
-    user.custom_fields["SCHOOL"] = query.data
-    query.edit_message_text(text="Selected school: {}".format(user.custom_fields["SCHOOL"]),
-    reply_markup=keyboards[query.data])
-
-    return "FIELD"
-
-def setField(update, context):
-    user = users[update.callback_query.message.chat.id]
-    query = update.callback_query
-
-    user.custom_fields["FIELD"] = query.data
-    query.edit_message_text(text="Selected school: {}\nSelected field: {}".format(
-        user.custom_fields["SCHOOL"],user.custom_fields["FIELD"]))
-
-    return "TARGET"
-
-def setTarget(update, context):
-    user = users[update.callback_query.message.chat.id]
-    query = update.callback_query
-
-    user.custom_fields["FIELD"] = query.data
-    query.edit_message_text(text="Selected school: {}\nSelected field: {}".format(
-        user.custom_fields["SCHOOL"],user.custom_fields["FIELD"]))
-
-    return "HOME"

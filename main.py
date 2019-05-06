@@ -27,13 +27,11 @@ def main():
     dp = updater.dispatcher
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={
-            "HOME": [CallbackQueryHandler(startMenu), ChosenInlineResultHandler(statehandler)],
-            "SCHOOL": [CallbackQueryHandler(setSchool)],
-            "FIELD": [CallbackQueryHandler(setField)],
-            "TARGET": [CallbackQueryHandler(setTarget)]
-        },
+        entry_points=[
+            CommandHandler('start', start),
+            CommandHandler('count', count),
+        ],
+        states={},
         fallbacks=[CommandHandler('start', start)],
         per_message=False,
         per_user=True
@@ -42,7 +40,10 @@ def main():
 
     # log all errors
     dp.add_error_handler(error)
-
+    
+    # Job queue for calling the invitations
+    j = updater.job_queue
+    j.run_repeating(raffle_pairs, interval=1, first=0)
     # Start the Bot
     updater.start_polling()
 

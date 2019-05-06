@@ -3,9 +3,6 @@ from constants import CUSTOM_FIELDS
 class Person:
     def __init__(self, User):
         self.User = User
-        self.custom_fields = {}
-        for c in CUSTOM_FIELDS:
-            self.custom_fields[c] = ""
 
     @property
     def id(self):
