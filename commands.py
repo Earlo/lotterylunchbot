@@ -23,8 +23,9 @@ def skip(update, context):
     if (userid in Users()):
         Users().disqualified_users.add(userid)
     else:
-        # User not registered
-        pass
+        # user not registered, register first, then skip today
+        start(update, context)
+        skip(update, context)
 
 
 def count(update, context):
@@ -43,24 +44,22 @@ def raffle_pairs(context):
     for a, b in Users().get_pairs():
         if (a == None or b == None):
             try:
-                context.bot.send_message(chat_id=a,
-                    text='Sorry, you were the odd one out today :(')
+                context.bot.send_message(chat_id=a, text=MISS)
             except:
-                context.bot.send_message(chat_id=b,
-                    text='Sorry, you were the odd one out today :(')
+                context.bot.send_message(chat_id=b, text=MISS)
         else:
             context.bot.send_message(chat_id=a, 
                 text=LUNCH.format(Users()[b].username))
             context.bot.send_message(chat_id=b, 
                 text=LUNCH.format(Users()[a].username))
+    Users().reset()
 
 def check_users(context):
     to_delete = set()
     for u in Users():
         try:
             context.bot.send_chat_action(u, 'typing')
-        except Exception as e:
-            print(e)
+        except:
             to_delete.add(u)
     for u in to_delete:
         del Users()[u]
