@@ -6,6 +6,7 @@ from singleton import Singleton
 class Users(metaclass=Singleton):
     users = {}
     free_users = set()
+    disqualified_users = set()
     def __getitem__(self, i):
         return self.users[i]
 
@@ -19,6 +20,9 @@ class Users(metaclass=Singleton):
     def __len__(self):
         return len(self.users)
 
+    def __delitem__(self, key):
+        del self.users[key]
+
     def get_pairs(self):
         rngkeys = list(self.users.keys())
         shuffle(rngkeys)
@@ -27,3 +31,7 @@ class Users(metaclass=Singleton):
         pairs = [[rngkeys[x*2],rngkeys[x*2+1]] for x in range(len(rngkeys)//2)]
         print(pairs)
         return pairs
+    
+    def reset(self):
+        self.free_users = set()
+        self.disqualified_users = set()

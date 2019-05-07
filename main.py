@@ -7,7 +7,7 @@ import requests
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, ChosenInlineResultHandler
 
 from constants import TOKEN 
-from commands import * 
+from commands import start, count, skip, raffle_pairs, remind
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,6 +30,7 @@ def main():
         entry_points=[
             CommandHandler('start', start),
             CommandHandler('count', count),
+            CommandHandler('skip', skip),
         ],
         states={},
         fallbacks=[CommandHandler('start', start)],
@@ -43,7 +44,9 @@ def main():
     
     # Job queue for calling the invitations
     j = updater.job_queue
+    j.run_repeating(remind, interval=1, first=0)
     j.run_repeating(raffle_pairs, interval=1, first=0)
+
     # Start the Bot
     updater.start_polling()
 
