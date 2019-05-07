@@ -22,8 +22,11 @@ class Users(metaclass=Singleton):
     def __delitem__(self, key):
         del self.users[key]
 
+    def get_qualified(self):
+        return list(set(self.users.keys()).difference(self.disqualified_users))
+
     def get_pairs(self):
-        rngkeys = list(set(self.users.keys()).difference(self.disqualified_users))
+        rngkeys = self.get_qualified()
         shuffle(rngkeys)
         if (len(rngkeys) % 2 == 1):
             rngkeys.append(None)

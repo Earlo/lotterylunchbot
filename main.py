@@ -6,7 +6,9 @@ import time
 import requests
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler, ChosenInlineResultHandler
 
-from constants import TOKEN 
+from datetime import datetime, timedelta, time
+
+from constants import TOKEN, REMIND_AT, LOTTERY_AT
 from commands import start, count, skip, raffle_pairs, remind
 
 # Enable logging
@@ -44,16 +46,21 @@ def main():
     
     # Job queue for calling the invitations
     j = updater.job_queue
-    j.run_repeating(remind, interval=1, first=0)
-    j.run_repeating(raffle_pairs, interval=1, first=0)
+    j.run_repeating(remind, interval=timedelta(days=1), first=time_until(REMIND_AT)) 
+    j.run_repeating(raffle_pairs, interval=timedelta(days=1), first=time_until(LOTTERY_AT))
 
     # Start the Bot
     updater.start_polling()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
+
+def time_until(t):
+    h, m = t.split(":")
+    dt = datetime.now()
+    tomorrow = dt
+    t = datetime.combine(tomorrow, time.min) - dt + timedelta(hours=int(h),  minutes=int(m))
+    print("Time until first", t)
+    return t
 
 if __name__ == '__main__':
     main()
