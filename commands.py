@@ -29,9 +29,8 @@ def skip(update, context):
 
 
 def count(update, context):
-    update.message.reply_text(
-        text=TALLY.format(len(Users()))
-    )
+    check_users(context)
+    update.message.reply_text(text=TALLY.format(len(Users())))
 
 def remind(context):
     check_users(context)
