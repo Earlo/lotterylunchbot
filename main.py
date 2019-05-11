@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, time
 from constants import TOKEN, REMIND_AT, LOTTERY_AT
 from commands import start, count, skip, raffle_pairs, remind, debug_raffle_pairs
 
+from users import Users
+
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -62,4 +64,6 @@ def time_until(t):
     return t
 
 if __name__ == '__main__':
+    #init users
+    Users()
     main()
