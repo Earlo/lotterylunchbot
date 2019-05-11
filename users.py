@@ -24,7 +24,7 @@ class Users(metaclass=Singleton):
                 'first_name': data['first_name'], 
                 'last_name': data['last_name'], 
                 'username': data['username']}
-        self.users[i] = value
+        self.users[str(i)] = value
 
     def __iter__(self):
         for x in self.users:
