@@ -2,12 +2,11 @@ from constants import LOTTERY_AT
 
 GREETING_NEW = """Hello {}!
 You seem to be a new user!
-Hope you find nice people to lunch with.
+You are now part of upcoming lunch lotteries.
 """
 
 GREETING = """Hello {{}}!
-Lunch Lottery is conducted every day at {}.
-If you don't want to take part use command /skip""".format(LOTTERY_AT)
+Lunch Lottery is conducted every day at {}.""".format(LOTTERY_AT)
 
 TALLY = """There are {} people using this bot!"""
 
