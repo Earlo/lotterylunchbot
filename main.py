@@ -9,7 +9,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 from datetime import datetime, timedelta, time
 
 from constants import TOKEN, REMIND_AT, LOTTERY_AT
-from commands import start, count, skip, raffle_pairs, remind
+from commands import start, count, skip, raffle_pairs, remind, debug_raffle_pairs
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -33,6 +33,7 @@ def main():
             CommandHandler('start', start),
             CommandHandler('count', count),
             CommandHandler('skip', skip),
+            CommandHandler('debugraffle', debug_raffle_pairs),
         ],
         states={},
         fallbacks=[CommandHandler('start', start)],
@@ -57,7 +58,7 @@ def main():
 def time_until(t):
     h, m = t.split(":")
     dt = datetime.now()
-    tomorrow = dt
+    tomorrow = dt + timedelta(days=1)
     t = datetime.combine(tomorrow, time.min) - dt + timedelta(hours=int(h),  minutes=int(m))
     print("Time until first", t)
     return t

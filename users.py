@@ -10,6 +10,8 @@ class Users(metaclass=Singleton):
         return self.users[i]
 
     def __setitem__(self, i, value):
+        print("setting", i, value)
+        print(self.users)
         self.users[i] = value
 
     def __iter__(self):
@@ -21,6 +23,9 @@ class Users(metaclass=Singleton):
 
     def __delitem__(self, key):
         del self.users[key]
+
+    def __repr__(self):
+        return self.users.__repr__()
 
     def get_qualified(self):
         return list(set(self.users.keys()).difference(self.disqualified_users))

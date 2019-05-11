@@ -13,10 +13,17 @@ def start(update, context):
         )
     else:
         user = Person(update.message.from_user)
-        Users()[userid] = user
-        update.message.reply_text(
-            text=GREETING_NEW.format(user.first_name)
-        )
+        if (len(user.username) > 0):
+            Users()[userid] = user
+            print("New user", user.username)
+            update.message.reply_text(
+                text=GREETING_NEW.format(user.first_name)
+            )
+        else:
+            update.message.reply_text(
+                text='You need username to use this bot'
+            )
+
 
 def skip(update, context):
     userid = update.message.from_user.id
@@ -38,6 +45,9 @@ def remind(context):
         context.bot.send_message(chat_id=u,
             text=REMINDER)
 
+def debug_raffle_pairs(update, context):
+    raffle_pairs(context)
+
 def raffle_pairs(context):
     check_users(context)
     for a, b in Users().get_pairs():
@@ -58,8 +68,10 @@ def check_users(context):
     for u in Users():
         try:
             context.bot.send_chat_action(u, 'typing')
+            Users()[u].update_data(context.bot.getChat(u))
         except:
             to_delete.add(u)
     for u in to_delete:
+        print("Removing", Users()[u].username)
         del Users()[u]
 
