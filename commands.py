@@ -1,5 +1,3 @@
-from person import Person 
-
 from users import Users
 from keyboards import keyboards
 from messages import *
@@ -9,10 +7,10 @@ def start(update, context):
     if (userid in Users()):
         user = Users()[userid]
         update.message.reply_text(
-            text=GREETING.format(user.first_name)
+            text=GREETING.format(user['first_name'])
         )
     else:
-        user = Person(update.message.from_user)
+        user = update.message.from_user
         if (len(user.username) > 0):
             Users()[userid] = user
             print("New user", user.username)
@@ -58,9 +56,9 @@ def raffle_pairs(context):
                 context.bot.send_message(chat_id=b, text=MISS)
         else:
             context.bot.send_message(chat_id=a, 
-                text=LUNCH.format(Users()[b].username))
+                text=LUNCH.format(Users()[b]['username']))
             context.bot.send_message(chat_id=b, 
-                text=LUNCH.format(Users()[a].username))
+                text=LUNCH.format(Users()[a]['username']))
     Users().reset()
 
 def check_users(context):
@@ -68,10 +66,11 @@ def check_users(context):
     for u in Users():
         try:
             context.bot.send_chat_action(u, 'typing')
-            Users()[u].update_data(context.bot.getChat(u))
+            Users()[u] = context.bot.getChat(u)
         except:
             to_delete.add(u)
     for u in to_delete:
-        print("Removing", Users()[u].username)
+        print("Removing", Users()[u]['username'])
         del Users()[u]
+    Users().save()
 

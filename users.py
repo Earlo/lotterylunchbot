@@ -2,14 +2,28 @@ from random import shuffle
 
 from singleton import Singleton
 
+import json
 
 class Users(metaclass=Singleton):
     users = {}
     disqualified_users = set()
+    def __init__(self):
+        self.load()
+
     def __getitem__(self, i):
         return self.users[i]
 
-    def __setitem__(self, i, value):
+    def __setitem__(self, i, data):
+        try:
+            value = {'id': data.id, 
+            'first_name': data.first_name, 
+            'last_name': data.last_name, 
+            'username': data.username}
+        except AttributeError:
+            value.data = {'id': data['id'], 
+                'first_name': data['first_name'], 
+                'last_name': data['last_name'], 
+                'username': data['username']}
         self.users[i] = value
 
     def __iter__(self):
@@ -39,3 +53,12 @@ class Users(metaclass=Singleton):
     
     def reset(self):
         self.disqualified_users = set()
+
+    def save(self):
+        with open('users.json', 'w') as fp:
+            json.dump(self.users, fp)
+
+    def load(self):
+        print("LOADING")
+        with open('users.json', 'r') as fp:
+            self.users = json.load(fp)
