@@ -1,5 +1,4 @@
 from users import Users
-from keyboards import keyboards
 from messages import *
 
 def start(update, context):
