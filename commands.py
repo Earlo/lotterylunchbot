@@ -2,7 +2,7 @@ from users import Users
 from messages import *
 
 def start(update, context):
-    userid = update.message.from_user.id
+    userid = str(update.message.from_user.id)
     if (userid in Users()):
         user = Users()[userid]
         update.message.reply_text(
@@ -23,7 +23,7 @@ def start(update, context):
 
 
 def skip(update, context):
-    userid = update.message.from_user.id
+    userid = str(update.message.from_user.id)
     if (userid in Users()):
         Users().disqualified_users.add(userid)
     else:
