@@ -16,8 +16,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def statehandler(bot, update):
-    print("State is being handled uwu")
 
 def error(bot, update):
     logger.warning('Update "%s" caused error "%s"', bot, update.error)
