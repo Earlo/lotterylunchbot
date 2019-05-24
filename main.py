@@ -8,7 +8,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 
 from datetime import datetime, timedelta, time
 
-from constants import TOKEN, REMIND_AT, LOTTERY_AT
+from constants import TOKEN, REMIND_AT, LOTTERY_AT, TIMEZONE
 from commands import start, count, skip, raffle_pairs, remind, debug_raffle_pairs
 
 from users import Users
@@ -59,7 +59,7 @@ def time_until(t):
     h, m = t.split(":")
     dt = datetime.now()
     tomorrow = dt + timedelta(days=1)
-    t = datetime.combine(tomorrow, time.min) - dt + timedelta(hours=int(h),  minutes=int(m))
+    t = datetime.combine(tomorrow, time.min) - dt + timedelta(hours=int(h + TIMEZONE),  minutes=int(m))
     print("Time until first", t)
     return t
 
