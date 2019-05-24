@@ -59,7 +59,7 @@ def time_until(t):
     h, m = t.split(":")
     dt = datetime.now()
     tomorrow = dt + timedelta(days=1)
-    t = datetime.combine(tomorrow, time.min) - dt + timedelta(hours=int(h + TIMEZONE),  minutes=int(m))
+    t = datetime.combine(tomorrow, time.min) - dt + timedelta(hours=int(h) + TIMEZONE,  minutes=int(m))
     print("Time until first", t)
     return t
 
