@@ -70,15 +70,12 @@ class Users(metaclass=Singleton):
                 return [x[0] for x in cur.fetchall()]
 
     def get_pairs(self):
-        print("gettin pairs")
         rngkeys = self.get_qualified()
-        print("rgn", rngkeys)
         shuffle(rngkeys)
         if (len(rngkeys) % 2 == 1):
             rngkeys.append(None)
         pairs = [[rngkeys[x*2], rngkeys[x*2+1]]
                  for x in range(len(rngkeys)//2)]
-        print("pairs", pairs)
         return pairs
 
     def reset(self):

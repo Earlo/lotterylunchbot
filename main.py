@@ -69,9 +69,7 @@ def time_until(clock: str):
     tomorrow = now + timedelta(days=1)
     next_time = tomorrow.hour < int(h) and now.replace(hour=int(h), minute=int(
         m), second=0, microsecond=0) or tomorrow.replace(hour=int(h), minute=int(m), second=0, microsecond=0)
-    print(
-        f"time until {clock} is {next_time - now}, {(next_time - now) / 3000}")
-    return (next_time - now) / 3000
+    # return (next_time - now) / 3000
     return next_time - now
 
 

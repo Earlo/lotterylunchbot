@@ -5,7 +5,7 @@ import psycopg2
 import psycopg2.extras
 
 
-class Schedules(metaclass=Singleton):
+class UsersPools(metaclass=Singleton):
     def __init__(self):
         self.check_db()
 
@@ -33,12 +33,10 @@ class Schedules(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute("""CREATE TABLE IF NOT EXISTS schedules (
-                    owner INTEGER REFERENCES users(id),
+                cur.execute("""CREATE TABLE IF NOT EXISTS userspools (
+                    user INTEGER REFERENCES users(id),
                     pool INTEGER REFERENCES pools(id),
-                    weekday VARCHAR(8),
-                    start_time TIME NOT NULL,
-                    end_time TIME NOT NULL,
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (owner, pool)
+                    CONSTRAINT unique_user_pool UNIQUE (user, pool),
+                    PRIMARY KEY (user, pool),
                 );""")

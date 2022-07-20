@@ -9,7 +9,6 @@ from telegram.ext import ContextTypes
 async def check_users(context: ContextTypes):
     to_delete = set()
     for u in Users():
-        print(u)
         try:
             await context.bot.send_chat_action(u, 'typing')
         except Exception as e:

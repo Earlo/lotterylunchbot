@@ -30,16 +30,21 @@ class Pools(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
+    def public_pools(self):
+        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
+            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""SELECT * FROM pools WHERE public = TRUE;""")
+                return cur.fetchall()
+
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
                 cur.execute("""CREATE TABLE IF NOT EXISTS pools (
-                    id SERIAL PRIMARY KEY,
+                    id INTEGER PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     public BOOLEAN NOT NULL DEFAULT FALSE,
                     owner INTEGER REFERENCES users(id),
-                    members integer[] REFERENCES users(id),
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    CONSTRAINT unique_id UNIQUE (id),
-                    CONSTRAINT unique_name UNIQUE (name)
+                    CONSTRAINT unique_pool_id UNIQUE (id),
+                    CONSTRAINT unique_pool_name UNIQUE (name)
                 );""")

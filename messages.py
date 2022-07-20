@@ -17,3 +17,15 @@ LUNCH = """Today you'll be having lunch with @{}!
 Send them a message!"""
 
 MISS = """Sorry, you were the odd one out today :("""
+
+
+OPTIONS = """Hello *{}*,
+You are in lottery pools: {}
+You're availeable for lunch on:
+{}
+"""
+POOL_OPTIONS = """Hello *{}*,
+Here are the public pools. Join any by clicking them.
+
+To join a private pool, use ```/join pool_name```
+"""
