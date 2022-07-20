@@ -20,10 +20,12 @@ class Users(metaclass=Singleton):
                     first_name,
                     last_name,
                     joined
-                    ) VALUES (%s, %s, %s, %s, %s)
+                    ) VALUES (%s, %s, %s, %s, %s) 
+                    ON CONFLICT (id) DO UPDATE SET username = %s, first_name = %s, last_name = %s
                     """
-                cur.execute(query, (data['id'], data['username'],
-                                    data['first_name'], data['last_name'], datetime.now()))
+                cur.execute(query, (data['id'], data['username'], data['first_name'], data['last_name'], datetime.now(
+                ), data['username'], data['first_name'], data['last_name']))
+                con.commit()
 
     def __getitem__(self, i):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
@@ -33,16 +35,15 @@ class Users(metaclass=Singleton):
 
     def __iter__(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            with con.cursor() as cur:
                 cur.execute(
-                    """SELECT *
+                    """SELECT id
                     FROM users
                     ORDER BY joined DESC
                     """
                 )
                 for user in cur.fetchall():
-                    print("usrs", user)
-                    yield user
+                    yield user[0]
 
     def __contains__(self, item):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
@@ -63,13 +64,15 @@ class Users(metaclass=Singleton):
 
     def get_qualified(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            with con.cursor() as cur:
                 cur.execute(
                     """SELECT id FROM users WHERE disqualified = FALSE""")
                 return [x[0] for x in cur.fetchall()]
 
     def get_pairs(self):
+        print("gettin pairs")
         rngkeys = self.get_qualified()
+        print("rgn", rngkeys)
         shuffle(rngkeys)
         if (len(rngkeys) % 2 == 1):
             rngkeys.append(None)
