@@ -1,25 +1,25 @@
-from users import Users
+from data.users import Users
+from data.pools import Pools
+from data.schedules import Schedules
+
 from messages import *
 
-def start(update, context):
+
+def register_user(update, context):
+    USERS = Users()
     userid = str(update.message.from_user.id)
-    if (userid in Users()):
-        user = Users()[userid]
+    print(userid, "in", USERS)
+    if (userid in USERS):
+        user = USERS[userid]
         update.message.reply_text(
-            text=GREETING.format(user['first_name'])
+            text=GREETING.format(user['first_name'],
+                                 os.environ.get("LOTTERY_AT"))
         )
     else:
-        user = update.message.from_user
-        if (len(user.username) > 0):
-            Users()[userid] = user
-            print("New user", user.username)
-            update.message.reply_text(
-                text=GREETING_NEW.format(user.first_name)
-            )
-        else:
-            update.message.reply_text(
-                text='You need username to use this bot'
-            )
+        USERS[userid] = update.message.from_user
+        update.message.reply_text(
+            text=GREETING_NEW.format(update.message.from_user.first_name)
+        )
 
 
 def skip(update, context):
@@ -28,7 +28,7 @@ def skip(update, context):
         Users().disqualified_users.add(userid)
     else:
         # user not registered, register first, then skip today
-        start(update, context)
+        register_user(update, context)
         skip(update, context)
 
 
@@ -36,14 +36,17 @@ def count(update, context):
     check_users(context)
     update.message.reply_text(text=TALLY.format(len(Users())))
 
+
 def remind(context):
     check_users(context)
     for u in Users():
         context.bot.send_message(chat_id=u,
-            text=REMINDER)
+                                 text=REMINDER.format(os.environ.get("LOTTERY_AT")))
+
 
 def debug_raffle_pairs(update, context):
     raffle_pairs(context)
+
 
 def raffle_pairs(context):
     check_users(context)
@@ -54,11 +57,12 @@ def raffle_pairs(context):
             except:
                 context.bot.send_message(chat_id=b, text=MISS)
         else:
-            context.bot.send_message(chat_id=a, 
-                text=LUNCH.format(Users()[b]['username']))
-            context.bot.send_message(chat_id=b, 
-                text=LUNCH.format(Users()[a]['username']))
+            context.bot.send_message(chat_id=a,
+                                     text=LUNCH.format(Users()[b]['username']))
+            context.bot.send_message(chat_id=b,
+                                     text=LUNCH.format(Users()[a]['username']))
     Users().reset()
+
 
 def check_users(context):
     to_delete = set()
@@ -72,4 +76,3 @@ def check_users(context):
         print("Removing", Users()[u]['username'])
         del Users()[u]
     Users().save()
-

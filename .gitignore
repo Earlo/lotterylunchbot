@@ -2,3 +2,7 @@
 __pycache__
 
 constants.py
+
+.DS_store
+
+.env
