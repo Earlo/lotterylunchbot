@@ -8,30 +8,29 @@ from utils import check_users
 from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOARD
 from telegram import Update, CallbackQuery
 from telegram.ext import ContextTypes, CallbackContext
+from telegram import ParseMode
 
 
 async def register_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-
     USERS = Users()
     userid = str(update.message.from_user.id)
-    if (userid in USERS):
+    if userid in USERS:
         user = USERS[userid]
         await update.message.reply_text(
-            text=GREETING.format(user['first_name'],
-                                 os.environ.get("LOTTERY_AT")),
-            reply_markup=HOMEKEYBOARD
+            text=GREETING.format(user["first_name"], os.environ.get("LOTTERY_AT")),
+            reply_markup=HOMEKEYBOARD,
         )
     else:
         USERS[userid] = update.message.from_user
         await update.message.reply_text(
             text=GREETING_NEW.format(update.message.from_user.first_name),
-            reply_markup=HOMEKEYBOARD
+            reply_markup=HOMEKEYBOARD,
         )
 
 
 async def skip(update: Update, context: ContextTypes):
     userid = str(update.message.from_user.id)
-    if (userid in Users()):
+    if userid in Users():
         Users().disqualified_users.add(userid)
     else:
         # user not registered, register first, then skip today
@@ -47,25 +46,32 @@ async def count(update: Update, context: ContextTypes):
 async def remind(context: CallbackContext):
     await check_users(context)
     for u in Users():
-        await context.bot.send_message(chat_id=u,
-                                       text=REMINDER.format(
-                                           os.environ.get("LOTTERY_AT")),
-                                       reply_markup=OK_KEYBOARD)
+        await context.bot.send_message(
+            chat_id=u,
+            text=REMINDER.format(os.environ.get("LOTTERY_AT")),
+            reply_markup=OK_KEYBOARD,
+        )
 
 
 async def raffle_pairs(context: CallbackContext):
     await check_users(context)
     for a, b in Users().get_pairs():
-        if (a == None or b == None):
+        if a == None or b == None:
             try:
-                await context.bot.send_message(chat_id=a, text=MISS, reply_markup=OK_KEYBOARD)
+                await context.bot.send_message(
+                    chat_id=a, text=MISS, reply_markup=OK_KEYBOARD
+                )
             except:
-                await context.bot.send_message(chat_id=b, text=MISS, reply_markup=OK_KEYBOARD)
+                await context.bot.send_message(
+                    chat_id=b, text=MISS, reply_markup=OK_KEYBOARD
+                )
         else:
-            await context.bot.send_message(chat_id=a,
-                                           text=LUNCH.format(Users()[b]['username']))
-            await context.bot.send_message(chat_id=b,
-                                           text=LUNCH.format(Users()[a]['username']))
+            await context.bot.send_message(
+                chat_id=a, text=LUNCH.format(Users()[b]["username"])
+            )
+            await context.bot.send_message(
+                chat_id=b, text=LUNCH.format(Users()[a]["username"])
+            )
     Users().reset()
 
 
@@ -77,10 +83,7 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
 
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     await query.answer()
-    print("Doing data", query.data)
     if query.data == "options":
         return await options_menu(query, update)
     elif query.data == "pools":
@@ -88,7 +91,9 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     elif query.data == "close":
         return await query.delete_message()
 
-    await query.edit_message_text(text=f"Selected option: {query.data}", reply_markup=OPTIONS_KEYBOARD)
+    await query.edit_message_text(
+        text=f"Selected option: {query.data}", reply_markup=OPTIONS_KEYBOARD
+    )
 
 
 async def options_menu(query: CallbackQuery, update: Update) -> None:
@@ -97,4 +102,8 @@ async def options_menu(query: CallbackQuery, update: Update) -> None:
 
 
 async def pools_menu(query: CallbackQuery, update: Update) -> None:
-    await query.edit_message_text(text=POOL_OPTIONS.format(query.from_user.first_name), reply_markup=POOLS_KEYBOARD())
+    await query.edit_message_text(
+        text=POOL_OPTIONS.format(query.from_user.first_name),
+        reply_markup=POOLS_KEYBOARD(),
+        parse_mode=ParseMode.MARKDOWN,
+    )

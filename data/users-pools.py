@@ -33,10 +33,12 @@ class UsersPools(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute("""CREATE TABLE IF NOT EXISTS userspools (
+                cur.execute(
+                    """CREATE TABLE IF NOT EXISTS userspools (
                     user INTEGER REFERENCES users(id),
                     pool INTEGER REFERENCES pools(id),
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CONSTRAINT unique_user_pool UNIQUE (user, pool),
                     PRIMARY KEY (user, pool),
-                );""")
+                );"""
+                )

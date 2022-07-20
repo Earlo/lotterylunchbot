@@ -33,7 +33,8 @@ class Schedules(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute("""CREATE TABLE IF NOT EXISTS schedules (
+                cur.execute(
+                    """CREATE TABLE IF NOT EXISTS schedules (
                     owner INTEGER REFERENCES users(id),
                     pool INTEGER REFERENCES pools(id),
                     weekday VARCHAR(8),
@@ -41,4 +42,5 @@ class Schedules(metaclass=Singleton):
                     end_time TIME NOT NULL,
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (owner, pool)
-                );""")
+                );"""
+                )

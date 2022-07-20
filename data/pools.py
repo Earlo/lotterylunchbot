@@ -39,7 +39,8 @@ class Pools(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute("""CREATE TABLE IF NOT EXISTS pools (
+                cur.execute(
+                    """CREATE TABLE IF NOT EXISTS pools (
                     id INTEGER PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
                     public BOOLEAN NOT NULL DEFAULT FALSE,
@@ -47,4 +48,5 @@ class Pools(metaclass=Singleton):
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CONSTRAINT unique_pool_id UNIQUE (id),
                     CONSTRAINT unique_pool_name UNIQUE (name)
-                );""")
+                );"""
+                )

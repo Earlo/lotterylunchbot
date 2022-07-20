@@ -23,8 +23,19 @@ class Users(metaclass=Singleton):
                     ) VALUES (%s, %s, %s, %s, %s) 
                     ON CONFLICT (id) DO UPDATE SET username = %s, first_name = %s, last_name = %s
                     """
-                cur.execute(query, (data['id'], data['username'], data['first_name'], data['last_name'], datetime.now(
-                ), data['username'], data['first_name'], data['last_name']))
+                cur.execute(
+                    query,
+                    (
+                        data["id"],
+                        data["username"],
+                        data["first_name"],
+                        data["last_name"],
+                        datetime.now(),
+                        data["username"],
+                        data["first_name"],
+                        data["last_name"],
+                    ),
+                )
                 con.commit()
 
     def __getitem__(self, i):
@@ -65,17 +76,15 @@ class Users(metaclass=Singleton):
     def get_qualified(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute(
-                    """SELECT id FROM users WHERE disqualified = FALSE""")
+                cur.execute("""SELECT id FROM users WHERE disqualified = FALSE""")
                 return [x[0] for x in cur.fetchall()]
 
     def get_pairs(self):
         rngkeys = self.get_qualified()
         shuffle(rngkeys)
-        if (len(rngkeys) % 2 == 1):
+        if len(rngkeys) % 2 == 1:
             rngkeys.append(None)
-        pairs = [[rngkeys[x*2], rngkeys[x*2+1]]
-                 for x in range(len(rngkeys)//2)]
+        pairs = [[rngkeys[x * 2], rngkeys[x * 2 + 1]] for x in range(len(rngkeys) // 2)]
         return pairs
 
     def reset(self):
@@ -87,7 +96,8 @@ class Users(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute("""CREATE TABLE IF NOT EXISTS users (
+                cur.execute(
+                    """CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY,
                     first_name TEXT,
                     last_name TEXT,
@@ -96,7 +106,8 @@ class Users(metaclass=Singleton):
                     disqualified BOOLEAN DEFAULT FALSE,
                     CONSTRAINT unique_id UNIQUE (id),
                     CONSTRAINT unique_username UNIQUE (username)
-                );""")
+                );"""
+                )
 
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
