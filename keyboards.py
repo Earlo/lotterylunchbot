@@ -32,5 +32,10 @@ OPTIONS_KEYBOARD = InlineKeyboardMarkup(
 
 def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
-        [[InlineKeyboardButton(pool.name) for pool in Pools().public_pools()]]
+        [
+            [InlineKeyboardButton(pool.name) for pool in Pools().public_pools()],
+            [
+                InlineKeyboardButton("Back", callback_data="profile"),
+            ],
+        ]
     )

@@ -39,10 +39,12 @@ class Pools(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
+                # cur.execute("""drop table if exists pools;""")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS pools (
                     id INTEGER PRIMARY KEY,
                     name VARCHAR(255) NOT NULL,
+                    description VARCHAR(255),
                     public BOOLEAN NOT NULL DEFAULT FALSE,
                     owner INTEGER REFERENCES users(id),
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

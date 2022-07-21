@@ -6,9 +6,8 @@ from messages import *
 from utils import check_users
 
 from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOARD
-from telegram import Update, CallbackQuery
+from telegram import Update, CallbackQuery, constants
 from telegram.ext import ContextTypes, CallbackContext
-from telegram import ParseMode
 
 
 async def register_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -105,5 +104,5 @@ async def pools_menu(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
         text=POOL_OPTIONS.format(query.from_user.first_name),
         reply_markup=POOLS_KEYBOARD(),
-        parse_mode=ParseMode.MARKDOWN,
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
     )

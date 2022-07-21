@@ -5,9 +5,11 @@ from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
     ConversationHandler,
+    MessageHandler,
+    filters,
 )
 
-from commands import (
+from commands.general import (
     register_user,
     count,
     skip,
@@ -16,7 +18,11 @@ from commands import (
     debug_raffle_pairs,
     inline_menu,
 )
-from datetime import datetime, timedelta
+from commands.pool import create_pool
+from commands.utils import save_input
+
+from utils import time_until
+from datetime import timedelta
 import logging
 import os
 from dotenv import load_dotenv
@@ -55,6 +61,20 @@ def main():
         per_message=False,
         per_user=True,
     )
+
+    # Get the dispatcher to register handlers
+    conv_handler = ConversationHandler(
+        entry_points=[
+            CommandHandler("create_pool", create_pool),
+        ],
+        states={
+            "TYPING": [MessageHandler(filters.TEXT & ~filters.COMMAND, save_input)],
+        },
+        fallbacks=[CommandHandler("start", register_user)],
+        per_message=False,
+        per_user=True,
+    )
+
     application.add_handler(conv_handler)
     application.add_handler(CallbackQueryHandler(inline_menu))
     # log all errors
@@ -73,23 +93,6 @@ def main():
     )
     # Start the Bot
     application.run_polling()
-
-
-def time_until(clock: str):
-    """
-    clock: HH:MM
-    Returns the amount of time it takes until it's the clock time.
-    """
-    h, m = clock.split(":")
-    now = datetime.now()
-    tomorrow = now + timedelta(days=1)
-    next_time = (
-        tomorrow.hour < int(h)
-        and now.replace(hour=int(h), minute=int(m), second=0, microsecond=0)
-        or tomorrow.replace(hour=int(h), minute=int(m), second=0, microsecond=0)
-    )
-    # return (next_time - now) / 3000
-    return next_time - now
 
 
 if __name__ == "__main__":
