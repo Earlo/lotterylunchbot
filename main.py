@@ -18,7 +18,7 @@ from commands.general import (
     debug_raffle_pairs,
     inline_menu,
 )
-from commands.pool import create_pool
+from commands.pool import create_pool, pool_creation_form
 from commands.utils import save_input
 
 from utils import time_until
@@ -63,11 +63,12 @@ def main():
     )
 
     # Get the dispatcher to register handlers
-    conv_handler = ConversationHandler(
+    pool_handler = ConversationHandler(
         entry_points=[
             CommandHandler("create_pool", create_pool),
         ],
         states={
+            "SELECTING": [CallbackQueryHandler(pool_creation_form)],
             "TYPING": [MessageHandler(filters.TEXT & ~filters.COMMAND, save_input)],
         },
         fallbacks=[CommandHandler("start", register_user)],
@@ -76,7 +77,10 @@ def main():
     )
 
     application.add_handler(conv_handler)
+    application.add_handler(pool_handler)
+
     application.add_handler(CallbackQueryHandler(inline_menu))
+
     # log all errors
     application.add_error_handler(error)
 

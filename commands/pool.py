@@ -46,11 +46,11 @@ async def adding_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
             [
                 InlineKeyboardButton(
                     text="Public",
-                    callback_data="PUBLIC",
+                    callback_data="POOL:public:True",
                 ),
                 InlineKeyboardButton(
                     text="Private",
-                    callback_data="PRIVATE",
+                    callback_data="POOL:public:False",
                 ),
             ]
         ]
@@ -60,3 +60,22 @@ async def adding_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
         reply_markup=keyboard,
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
+    return "SELECTING"
+
+
+async def pool_creation_form(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Parses the CallbackQuery and updates the message text."""
+    query = update.callback_query
+
+    await query.answer()
+    FORM, FIELD, DATA = query.data.split(":")
+    if FORM == "POOL":
+        context.user_data["FEATURES"][FIELD] = DATA
+
+    await query.edit_message_text(
+        text=f"Selected option: {DATA}", reply_markup=OK_KEYBOARD
+    )
+
+    return ""
