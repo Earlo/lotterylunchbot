@@ -18,8 +18,8 @@ from commands.general import (
     debug_raffle_pairs,
     inline_menu,
 )
-from commands.pool import create_pool, pool_creation_form
-from commands.utils import save_input
+from commands.pool import create_pool, choose
+from commands.utils import save_text_input, save_button_input
 
 from utils import time_until
 from datetime import timedelta
@@ -68,8 +68,11 @@ def main():
             CommandHandler("create_pool", create_pool),
         ],
         states={
-            "SELECTING": [CallbackQueryHandler(pool_creation_form)],
-            "TYPING": [MessageHandler(filters.TEXT & ~filters.COMMAND, save_input)],
+            "SELECTING": [CallbackQueryHandler(save_button_input)],
+            "TYPING": [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, save_text_input)
+            ],
+            "CONFIRM": [CallbackQueryHandler(choose)],
         },
         fallbacks=[CommandHandler("start", register_user)],
         per_message=False,

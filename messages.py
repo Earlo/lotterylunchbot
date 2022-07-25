@@ -43,3 +43,8 @@ Do you want your pool to be public or private?"""
 CREATE_POOL2 = """Do you want to add a description?"""
 
 CREATE_POOL3 = """Please type your pool's description\."""
+
+
+CREATE_POOL4 = """Created pool\. 
+
+{}"""

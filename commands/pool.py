@@ -6,8 +6,8 @@ from messages import *
 
 from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOARD
 from telegram import (
+    Message,
     Update,
-    CallbackQuery,
     constants,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -17,7 +17,7 @@ from telegram.ext import ContextTypes, CallbackContext
 from commands.general import register_user
 
 
-async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     USERS = Users()
     userid = str(update.message.from_user.id)
     if userid in USERS:
@@ -29,7 +29,8 @@ async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
         user_data = context.user_data
 
-        user_data["FEATURES"] = {}
+        user_data["FORM"] = "POOL"
+        user_data["POOL"] = {}
         user_data["CURRENT_FEATURE"] = "name"
         user_data["NEXT_PHASE"] = adding_name
         return "TYPING"
@@ -38,9 +39,24 @@ async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         register_user(update, context)
 
 
-async def adding_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
-    print("Adding name", context.user_data)
+    query = update.callback_query
+    user_data = context.user_data
+    print("choising")
+    await query.answer()
+    CHOICE, DATA = query.data.split(":")
+    if CHOICE == "add_description":
+        if DATA == "True":
+            user_data["CURRENT_FEATURE"] = "description"
+            user_data["NEXT_PHASE"] = check
+            return "TYPING"
+        else:
+            return await check(query.message)
+
+
+async def adding_name(message: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Add information about yourself."""
     keyboard = InlineKeyboardMarkup(
         [
             [
@@ -55,27 +71,43 @@ async def adding_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
             ]
         ]
     )
-    await update.message.reply_text(
-        text=CREATE_POOL1.format(context.user_data["FEATURES"]["name"]),
+    await message.reply_text(
+        text=CREATE_POOL1.format(context.user_data["POOL"]["name"]),
         reply_markup=keyboard,
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
+    context.user_data["NEXT_PHASE"] = add_description
     return "SELECTING"
 
 
-async def pool_creation_form(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
-    """Parses the CallbackQuery and updates the message text."""
-    query = update.callback_query
-
-    await query.answer()
-    FORM, FIELD, DATA = query.data.split(":")
-    if FORM == "POOL":
-        context.user_data["FEATURES"][FIELD] = DATA
-
-    await query.edit_message_text(
-        text=f"Selected option: {DATA}", reply_markup=OK_KEYBOARD
+async def add_description(message: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """Add information about yourself."""
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    text="Yes",
+                    callback_data="add_description:True",
+                ),
+                InlineKeyboardButton(
+                    text="No",
+                    callback_data="add_description:False",
+                ),
+            ]
+        ]
     )
+    await message.edit_text(
+        text=CREATE_POOL2,
+        reply_markup=keyboard,
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
+    )
+    return "CONFIRM"
 
-    return ""
+
+async def check(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
+    print("finish")
+    await message.reply_text(
+        text=CREATE_POOL4.format(context.user_data),
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
+    )
+    return "HOME"
