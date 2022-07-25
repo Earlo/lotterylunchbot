@@ -1,7 +1,7 @@
 from telegram.ext import ContextTypes
 from telegram import Message, Update
 
-from keyboards import OK_KEYBOARD
+from keyboards import CLEANUP
 
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:

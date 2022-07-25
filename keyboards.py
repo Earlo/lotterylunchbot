@@ -1,6 +1,14 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from data.pools import Pools
 
+CLEANUP = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton("🧹", callback_data="close"),
+        ],
+    ]
+)
+
 OK_KEYBOARD = InlineKeyboardMarkup(
     [
         [
@@ -26,6 +34,36 @@ OPTIONS_KEYBOARD = InlineKeyboardMarkup(
             InlineKeyboardButton("Manage dates", callback_data="dates"),
         ],
         [InlineKeyboardButton("Back", callback_data="0")],
+    ]
+)
+
+YES_NO_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton(
+                text="Yes",
+                callback_data="True",
+            ),
+            InlineKeyboardButton(
+                text="No",
+                callback_data="False",
+            ),
+        ]
+    ]
+)
+
+SUBMIT_CANCEL_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton(
+                text="Submit",
+                callback_data="True",
+            ),
+            InlineKeyboardButton(
+                text="Cancel",
+                callback_data="False",
+            ),
+        ]
     ]
 )
 
