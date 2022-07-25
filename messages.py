@@ -45,6 +45,8 @@ CREATE_POOL2 = """Do you want to add a description?"""
 CREATE_POOL3 = """Please type your pool's description\."""
 
 
-CREATE_POOL4 = """Created pool\. 
+CREATE_POOL4 = """Creating pool. 
 
-{}"""
+Name: {}
+Description: {}
+Public: {}"""

@@ -1,6 +1,9 @@
 from data.users import Users
 from data.pools import Pools
 from data.schedules import Schedules
+import json
+
+from telegram.helpers import escape_markdown
 
 from messages import *
 
@@ -28,7 +31,6 @@ async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
         )
 
         user_data = context.user_data
-
         user_data["FORM"] = "POOL"
         user_data["POOL"] = {}
         user_data["CURRENT_FEATURE"] = "name"
@@ -43,11 +45,14 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
     query = update.callback_query
     user_data = context.user_data
-    print("choising")
     await query.answer()
     CHOICE, DATA = query.data.split(":")
     if CHOICE == "add_description":
         if DATA == "True":
+            await update.callback_query.edit_message_text(
+                text=CREATE_POOL3,
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
+            )
             user_data["CURRENT_FEATURE"] = "description"
             user_data["NEXT_PHASE"] = check
             return "TYPING"
@@ -105,9 +110,15 @@ async def add_description(message: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 async def check(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
-    print("finish")
     await message.reply_text(
-        text=CREATE_POOL4.format(context.user_data),
+        text=escape_markdown(
+            CREATE_POOL4.format(
+                context.user_data["POOL"]["name"],
+                context.user_data["POOL"]["description"],
+                context.user_data["POOL"]["public"],
+            ),
+            version=2,
+        ),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
     return "HOME"

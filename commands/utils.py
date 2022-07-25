@@ -7,13 +7,12 @@ from keyboards import OK_KEYBOARD
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Save input for feature and return to feature phase selection."""
     print("Got text input")
-    FORM = context.user_data["FORM"]
-    FIELD = context.user_data["CURRENT_FEATURE"]
-    DATA = update.message.text
-    try:
-        return await save_input(update.message, context, FORM, FIELD, DATA)
-    except Exception as e:
-        print("error", e)
+    FORM, FIELD, DATA = [
+        context.user_data["FORM"],
+        context.user_data["CURRENT_FEATURE"],
+        update.message.text,
+    ]
+    return await save_input(update.message, context, FORM, FIELD, DATA)
 
 
 async def save_button_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -22,9 +21,6 @@ async def save_button_input(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     query = update.callback_query
     await query.answer()
     FORM, FIELD, DATA = query.data.split(":")
-    await query.edit_message_text(
-        text=f"Selected option: {DATA}", reply_markup=OK_KEYBOARD
-    )
     return await save_input(query.message, context, FORM, FIELD, DATA)
 
 
