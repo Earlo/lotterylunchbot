@@ -7,12 +7,12 @@ import psycopg2.extras
 
 class Schedules(metaclass=Singleton):
     def __init__(self):
-        self.check_db()
-
-    def __setitem__(self, i, data):
         pass
 
-    def __getitem__(self, i):
+    def __setitem__(self, i: int, data):
+        pass
+
+    def __getitem__(self, i: int):
         pass
 
     def __iter__(self):
@@ -44,3 +44,6 @@ class Schedules(metaclass=Singleton):
                     PRIMARY KEY (owner, pool)
                 );"""
                 )
+
+
+SCHEDULES = Schedules()

@@ -25,15 +25,15 @@ You're availeable for lunch on:
 {}
 """
 POOL_OPTIONS = """Hello *{}*,
-Here are the public pools\. Join any by clicking them\.
+Here are the public pools. Join any by clicking them.
 
-If you've been asked to join a private pool, use `\/join <pool_name>`
+If you've been asked to join a private pool, use `/join <pool_name>`
 """
 
 
 CREATE_POOL0 = """Hello *{}*,
 
-Please enter the name of your pool\.
+Please enter the name of your pool.
 """
 
 CREATE_POOL1 = """Set name to *{}*,
@@ -42,10 +42,17 @@ Do you want your pool to be public or private?"""
 
 CREATE_POOL2 = """Do you want to add a description?"""
 
-CREATE_POOL3 = """Please type your pool's description\."""
+CREATE_POOL3 = """Please type your pool's description."""
 
 
 CREATE_POOL4 = """Creating pool. 
+
+Name: {}
+Description: {}
+Public: {}"""
+
+
+CREATE_POOL5 = """Created pool. 
 
 Name: {}
 Description: {}

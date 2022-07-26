@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from data.pools import Pools
+from data.pools import POOLS
 
 CLEANUP = InlineKeyboardMarkup(
     [
@@ -71,7 +71,7 @@ SUBMIT_CANCEL_KEYBOARD = InlineKeyboardMarkup(
 def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton(pool.name) for pool in Pools().public_pools()],
+            [InlineKeyboardButton(pool.name) for pool in POOLS.public_pools()],
             [
                 InlineKeyboardButton("Back", callback_data="profile"),
             ],

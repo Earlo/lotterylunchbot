@@ -1,5 +1,5 @@
-from data.users import Users
-from data.pools import Pools
+from data.users import USERS
+from data.pools import POOLS
 from data.schedules import Schedules
 
 from telegram.helpers import escape_markdown
@@ -13,6 +13,7 @@ from keyboards import (
     OK_KEYBOARD,
     YES_NO_KEYBOARD,
     CLEANUP,
+    SUBMIT_CANCEL_KEYBOARD,
 )
 from telegram import (
     Message,
@@ -27,18 +28,16 @@ from commands.general import register_user
 
 
 async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    USERS = Users()
     userid = str(update.message.from_user.id)
     if userid in USERS:
         user = USERS[userid]
         await update.message.reply_text(
-            text=CREATE_POOL0.format(user["first_name"]),
+            text=escape_markdown(CREATE_POOL0.format(user["first_name"]), version=2),
             parse_mode=constants.ParseMode.MARKDOWN_V2,
         )
-
         user_data = context.user_data
         user_data["FORM"] = "POOL"
-        user_data["POOL"] = {}
+        user_data["POOL"] = {"owner": userid}
         user_data["CURRENT_FEATURE"] = "name"
         user_data["NEXT_PHASE"] = add_name
         return "TYPING"
@@ -55,7 +54,7 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     if context.user_data["CHOICE"] == "add_description":
         if DATA == "True":
             await update.callback_query.edit_message_text(
-                text=CREATE_POOL3,
+                text=escape_markdown(CREATE_POOL3, version=2),
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
             )
             context.user_data["CURRENT_FEATURE"] = "description"
@@ -63,6 +62,22 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             return "TYPING"
         else:
             return await check(query.message)
+    elif context.user_data["CHOICE"] == "submit_pool":
+        if DATA == "True":
+            POOLS.append(context.user_data["POOL"])
+            await update.callback_query.edit_message_text(
+                text=escape_markdown(
+                    CREATE_POOL5.format(
+                        context.user_data["POOL"]["name"],
+                        context.user_data["POOL"]["description"],
+                        context.user_data["POOL"]["public"],
+                    ),
+                    version=2,
+                ),
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
+                reply_markup=OK_KEYBOARD,
+            )
+        return "HOME"
 
 
 async def add_name(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -82,7 +97,9 @@ async def add_name(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
         ]
     )
     await message.reply_text(
-        text=CREATE_POOL1.format(context.user_data["POOL"]["name"]),
+        text=escape_markdown(
+            CREATE_POOL1.format(context.user_data["POOL"]["name"]), version=2
+        ),
         reply_markup=keyboard,
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
@@ -94,7 +111,7 @@ async def add_description(message: Message, context: ContextTypes.DEFAULT_TYPE) 
     """Add information about the pool."""
     context.user_data["CHOICE"] = "add_description"
     await message.edit_text(
-        text=CREATE_POOL2,
+        text=escape_markdown(CREATE_POOL2, version=2),
         reply_markup=YES_NO_KEYBOARD,
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
@@ -102,6 +119,7 @@ async def add_description(message: Message, context: ContextTypes.DEFAULT_TYPE) 
 
 
 async def check(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
+    context.user_data["CHOICE"] = "submit_pool"
     await message.reply_text(
         text=escape_markdown(
             CREATE_POOL4.format(
@@ -111,6 +129,7 @@ async def check(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
             ),
             version=2,
         ),
+        reply_markup=SUBMIT_CANCEL_KEYBOARD,
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
-    return "HOME"
+    return "CONFIRM"

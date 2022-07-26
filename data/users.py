@@ -9,9 +9,9 @@ import psycopg2.extras
 
 class Users(metaclass=Singleton):
     def __init__(self):
-        self.check_db()
+        pass
 
-    def __setitem__(self, i, data):
+    def __setitem__(self, i: int, data):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
                 query = f"""INSERT INTO users (
@@ -26,7 +26,7 @@ class Users(metaclass=Singleton):
                 cur.execute(
                     query,
                     (
-                        data["id"],
+                        i,
                         data["username"],
                         data["first_name"],
                         data["last_name"],
@@ -38,7 +38,7 @@ class Users(metaclass=Singleton):
                 )
                 con.commit()
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT * FROM users WHERE id = %s""", (i,))
@@ -72,6 +72,9 @@ class Users(metaclass=Singleton):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""DELETE FROM users WHERE id = %s""", (key,))
+
+    def __repr__(self) -> str:
+        return str(list(self.__iter__()))
 
     def get_qualified(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
@@ -109,5 +112,5 @@ class Users(metaclass=Singleton):
                 );"""
                 )
 
-    def __repr__(self) -> str:
-        return str(list(self.__iter__()))
+
+USERS = Users()

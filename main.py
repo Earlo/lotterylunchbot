@@ -1,4 +1,7 @@
-from data.users import Users
+from data.users import USERS
+from data.pools import POOLS
+from data.schedules import SCHEDULES
+from data.usersPools import USERS_POOLS
 
 from telegram.ext import (
     Application,
@@ -73,6 +76,7 @@ def main():
                 MessageHandler(filters.TEXT & ~filters.COMMAND, save_text_input)
             ],
             "CONFIRM": [CallbackQueryHandler(choose)],
+            "DONE": [],
         },
         fallbacks=[CommandHandler("start", register_user)],
         per_message=False,
@@ -103,6 +107,10 @@ def main():
 
 
 if __name__ == "__main__":
-    # init users
-    Users()
+    # init tables
+    USERS.check_db()
+    POOLS.check_db()
+    SCHEDULES.check_db()
+    USERS_POOLS.check_db()
+
     main()
