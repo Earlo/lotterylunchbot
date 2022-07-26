@@ -11,7 +11,7 @@ class Pools(metaclass=Singleton):
     def __init__(self):
         pass
 
-    def __setitem__(self, i: int, data):
+    def __setitem__(self, pool_id: int, data):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
                 query = f"""INSERT INTO pools (
@@ -20,13 +20,15 @@ class Pools(metaclass=Singleton):
                     description,
                     public,
                     created_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s) 
+                    ) VALUES (%s, %s, %s, %s, %s) 
                     ON CONFLICT (id) DO UPDATE SET name = %s, description = %s, public = %s, updated_at = %s
+                    RETURNING *;
                     """
+                print(1)
                 cur.execute(
                     query,
                     (
-                        i,
+                        pool_id,
                         data["name"],
                         data["description"],
                         data["public"],
@@ -37,7 +39,8 @@ class Pools(metaclass=Singleton):
                         datetime.now(),
                     ),
                 )
-                con.commit()
+                print(2)
+                return cur.fetchone()
 
     def append(self, data):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
@@ -100,7 +103,7 @@ class Pools(metaclass=Singleton):
                     """SELECT 
                         pools.public, pools.name, count(*) 
                         FROM 
-                        pools LEFT poolMembers ON pools.id = poolMembers.pool 
+                        pools LEFT JOIN poolMembers ON pools.id = poolMembers.pool 
                         WHERE
                         poolMembers.account = %s GROUP BY pools.id;""",
                     (account_id,),

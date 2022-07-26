@@ -11,7 +11,7 @@ class Accounts(metaclass=Singleton):
     def __init__(self):
         pass
 
-    def __setitem__(self, i: int, data):
+    def __setitem__(self, account_id: int, data):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
                 query = f"""INSERT INTO accounts (
@@ -26,7 +26,7 @@ class Accounts(metaclass=Singleton):
                 cur.execute(
                     query,
                     (
-                        i,
+                        account_id,
                         data["username"],
                         data["first_name"],
                         data["last_name"],
@@ -36,12 +36,11 @@ class Accounts(metaclass=Singleton):
                         data["last_name"],
                     ),
                 )
-                con.commit()
 
-    def __getitem__(self, i: int):
+    def __getitem__(self, account_id: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute("""SELECT * FROM accounts WHERE id = %s""", (i,))
+                cur.execute("""SELECT * FROM accounts WHERE id = %s""", (account_id,))
                 return cur.fetchone()
 
     def __iter__(self):

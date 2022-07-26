@@ -10,10 +10,10 @@ class PoolMembers(metaclass=Singleton):
     def __init__(self):
         pass
 
-    def __setitem__(self, i: int, data):
+    def __setitem__(self, account_pool: tuple, data):
         pass
 
-    def __getitem__(self, i: int):
+    def __getitem__(self, account_pool: tuple):
         pass
 
     def __iter__(self):
@@ -77,6 +77,12 @@ class PoolMembers(metaclass=Singleton):
     def append(self, account: int, pool: int, admin: bool = False):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # Check if there is an admin already
+                cur.execute(
+                    """SELECT admin FROM poolMembers WHERE pool = %s;""", (pool,)
+                )
+                res = cur.fetchone()
+                has_admin = res is not None and res["admin"]
                 try:
                     query = f"""INSERT INTO poolMembers (
                         account,
@@ -90,7 +96,7 @@ class PoolMembers(metaclass=Singleton):
                         (
                             account,
                             pool,
-                            admin,
+                            admin if has_admin else True,
                             datetime.now(),
                         ),
                     )

@@ -21,7 +21,7 @@ from commands.general import (
     debug_raffle_pairs,
     inline_menu,
 )
-from commands.pool import create_pool, choose, join_pool
+from commands.pool import create_pool, choose, join_pool, pool_menu_callbacks
 from commands.utils import save_text_input, save_button_input
 
 from utils import time_until
@@ -69,6 +69,7 @@ def main():
         entry_points=[
             CommandHandler("create_pool", create_pool),
             CommandHandler("join", join_pool),
+            CallbackQueryHandler(pool_menu_callbacks, pattern="pool_menu"),
         ],
         states={
             "SELECTING": [CallbackQueryHandler(save_button_input)],

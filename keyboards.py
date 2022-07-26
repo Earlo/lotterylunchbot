@@ -30,8 +30,8 @@ HOMEKEYBOARD = InlineKeyboardMarkup(
 OPTIONS_KEYBOARD = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("Manage pools", callback_data="pools_menu"),
-            InlineKeyboardButton("Manage dates", callback_data="dates_menu"),
+            InlineKeyboardButton("Manage pools", callback_data="pool_menu"),
+            InlineKeyboardButton("Manage dates", callback_data="date_menu"),
         ],
         [InlineKeyboardButton("Back", callback_data="0")],
     ]
@@ -95,8 +95,8 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
             ],
             [
                 InlineKeyboardButton(
-                    f"Edit title",
-                    callback_data=f"pool_menu:{pool['id']}:edit:title",
+                    f"Edit name",
+                    callback_data=f"pool_menu:{pool['id']}:edit:name",
                 ),
                 InlineKeyboardButton(
                     f"Edit description",
@@ -110,7 +110,7 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
             if is_admin
             else [],
             [
-                InlineKeyboardButton("Back", callback_data="pools_menu"),
+                InlineKeyboardButton("Back", callback_data="ools_menu"),
             ],
         ]
     )

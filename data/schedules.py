@@ -9,10 +9,10 @@ class Schedules(metaclass=Singleton):
     def __init__(self):
         pass
 
-    def __setitem__(self, i: int, data):
+    def __setitem__(self, schedule_id: int, data):
         pass
 
-    def __getitem__(self, i: int):
+    def __getitem__(self, schedule_id: int):
         pass
 
     def __iter__(self):
@@ -33,15 +33,16 @@ class Schedules(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
+                cur.execute("drop table if exists schedules;")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS schedules (
-                    owner INTEGER REFERENCES accounts(id),
+                    account INTEGER REFERENCES accounts(id),
                     pool INTEGER REFERENCES pools(id),
                     weekday VARCHAR(8),
                     start_time TIME NOT NULL,
                     end_time TIME NOT NULL,
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    PRIMARY KEY (owner, pool)
+                    PRIMARY KEY (account, pool)
                 );"""
                 )
 

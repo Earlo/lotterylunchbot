@@ -7,6 +7,7 @@ from commands.account import register_account
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Save input for feature and return to feature phase selection."""
+    print("save_text_input")
     FORM, FIELD, DATA = [
         context.user_data["FORM"],
         context.user_data["CURRENT_FEATURE"],
@@ -30,6 +31,7 @@ async def save_input(
     FIELD: str,
     DATA: str,
 ) -> str:
+    print("asdf", context.user_data, DATA)
     context.user_data[FORM][FIELD] = DATA
     return await context.user_data["NEXT_PHASE"](message, context)
 
