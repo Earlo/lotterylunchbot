@@ -61,7 +61,16 @@ class Pools(metaclass=Singleton):
                 return cur.fetchone()
 
     def __getitem__(self, i: int):
-        pass
+        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
+            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""SELECT * FROM pools WHERE id = %s;""", (i,))
+                return cur.fetchone()
+
+    def get_by_name(self, name: str):
+        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
+            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""SELECT * FROM pools WHERE name ILIKE %s;""", (name,))
+                return cur.fetchone()
 
     def __iter__(self):
         pass

@@ -34,23 +34,26 @@ class AccountsPools(metaclass=Singleton):
     def append(self, account: int, pool: int, admin: bool = False):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                query = f"""INSERT INTO accountsPools (
-                    account,
-                    pool,
-                    admin,
-                    created
-                    ) VALUES (%s, %s, %s, %s) 
-                    RETURNING *;"""
-                cur.execute(
-                    query,
-                    (
+                try:
+                    query = f"""INSERT INTO accountsPools (
                         account,
                         pool,
                         admin,
-                        datetime.now(),
-                    ),
-                )
-                return cur.fetchone()
+                        created
+                        ) VALUES (%s, %s, %s, %s) 
+                        RETURNING *;"""
+                    cur.execute(
+                        query,
+                        (
+                            account,
+                            pool,
+                            admin,
+                            datetime.now(),
+                        ),
+                    )
+                    return cur.fetchone()
+                except psycopg2.IntegrityError:
+                    return None
 
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:

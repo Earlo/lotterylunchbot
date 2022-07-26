@@ -1,3 +1,4 @@
+from http.client import responses
 from sqlalchemy import true
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
@@ -18,24 +19,68 @@ from telegram import (
 )
 from telegram.ext import ContextTypes, CallbackContext
 
-from commands.general import register_account
+from commands.utils import requires_account
 
 
-async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    userid = context._user_id
-    if userid in ACCOUNTS:
-        account = ACCOUNTS[userid]
+@requires_account
+async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    pool_name = update.message.text.split(" ")[1]
+    pool = POOLS.get_by_name(pool_name)
+    if pool == None:
         await update.message.reply_markdown_v2(
-            text=CREATE_POOL0.format(escape_markdown(account["first_name"]), version=2),
+            text=JOIN_POOL_FAIL.format(escape_markdown(pool_name, version=2)),
         )
-        context.user_data["FORM"] = "POOL"
-        context.user_data["POOL"] = {}
-        context.user_data["CURRENT_FEATURE"] = "name"
-        context.user_data["NEXT_PHASE"] = add_name
-        return "TYPING"
     else:
-        # Not registered, register first
-        await register_account(update, context)
+        response = ACCOUNTS_POOLS.append(context._user_id, pool["id"])
+        if response == None:
+            await update.message.reply_markdown_v2(
+                text=JOIN_POOL_ALREADY_MEMBER.format(
+                    escape_markdown(pool_name, version=2)
+                ),
+            )
+        else:
+            await update.message.reply_markdown_v2(
+                text=JOIN_POOL_SUCCESS.format(escape_markdown(pool_name, version=2)),
+            )
+    return -1
+
+
+@requires_account
+async def leave_pool(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    return -1
+    # NOT IMPLEMENTED
+    pool_name = update.message.text.split(" ")[1]
+    pool = POOLS.get_by_name(pool_name)
+    if pool == None:
+        await update.message.reply_markdown_v2(
+            text=LEAVE_POOL_FAIL.format(escape_markdown(pool_name, version=2)),
+        )
+    else:
+        response = ACCOUNTS_POOLS.remove(context._user_id, pool["id"])
+        if response == None:
+            await update.message.reply_markdown_v2(
+                text=LEAVE_POOL_NOT_MEMBER.format(
+                    escape_markdown(pool_name, version=2)
+                ),
+            )
+        else:
+            await update.message.reply_markdown_v2(
+                text=LEAVE_POOL_SUCCESS.format(escape_markdown(pool_name, version=2)),
+            )
+    return -1
+
+
+@requires_account
+async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    account = ACCOUNTS[context._user_id]
+    await update.message.reply_markdown_v2(
+        text=CREATE_POOL0.format(escape_markdown(account["first_name"], version=2)),
+    )
+    context.user_data["FORM"] = "POOL"
+    context.user_data["POOL"] = {}
+    context.user_data["CURRENT_FEATURE"] = "name"
+    context.user_data["NEXT_PHASE"] = add_name
+    return "TYPING"
 
 
 async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -90,7 +135,7 @@ async def add_name(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
     )
     await message.reply_markdown_v2(
         text=CREATE_POOL1.format(
-            escape_markdown(context.user_data["POOL"]["name"]), version=2
+            escape_markdown(context.user_data["POOL"]["name"], version=2)
         ),
         reply_markup=keyboard,
     )

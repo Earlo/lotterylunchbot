@@ -29,7 +29,11 @@ POOL_LIST = """{} *{}* has {} members\."""
 POOL_OPTIONS = """Hello *{}*,
 Here are the public pools\. Join any by clicking them\.
 
-If you've been asked to join a private pool, use `\/join <pool_name>`
+If you've been asked to join a private pool, use 
+`\/join <pool_name>`
+
+To create a new pool use
+`\/create_pool`
 """
 
 
@@ -59,3 +63,17 @@ CREATE_POOL5 = """Created pool\.
 Name: {}
 Description: {}
 Public: {}"""
+
+
+JOIN_POOL_FAIL = """Pool named _{}_ doesn't exist\."""
+
+JOIN_POOL_ALREADY_MEMBER = """You are already a member of _{}_\."""
+
+JOIN_POOL_SUCCESS = """You have joined pool _{}_\."""
+
+
+LEAVE_POOL_FAIL = """Pool named _{}_ doesn't exist\."""
+
+LEAVE_POOL_NOT_MEMBER = """You are not a member of _{}_\."""
+
+LEAVE_POOL_SUCCESS = """You have left pool _{}_\."""

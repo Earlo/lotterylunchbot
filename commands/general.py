@@ -10,37 +10,24 @@ from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOAR
 from telegram import Update, CallbackQuery, constants
 from telegram.ext import ContextTypes, CallbackContext
 from telegram.helpers import escape_markdown
+from commands.utils import requires_account
 
 
-async def register_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    userid = update.message.from_user.id
-    if userid in ACCOUNTS:
-        account = ACCOUNTS[userid]
-        await update.message.reply_markdown_v2(
-            text=GREETING.format(
-                escape_markdown(account["first_name"], version=2),
-                os.environ.get("LOTTERY_AT"),
-            ),
-            reply_markup=HOMEKEYBOARD,
-        )
-    else:
-        ACCOUNTS[userid] = update.message.from_user
-        await update.message.reply_markdown_v2(
-            text=GREETING_NEW.format(
-                escape_markdown(update.message.from_user.first_name, version=2)
-            ),
-            reply_markup=HOMEKEYBOARD,
-        )
+@requires_account
+async def home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    account = ACCOUNTS[update.message.from_user.id]
+    await update.message.reply_markdown_v2(
+        text=GREETING.format(
+            escape_markdown(account["first_name"], version=2),
+            os.environ.get("LOTTERY_AT"),
+        ),
+        reply_markup=HOMEKEYBOARD,
+    )
 
 
+@requires_account
 async def skip(update: Update, context: ContextTypes):
-    userid = update.message.from_user.id
-    if userid in ACCOUNTS:
-        ACCOUNTS.disqualified_accounts.add(userid)
-    else:
-        # account not registered, register first, then skip today
-        register_account(update, context)
-        skip(update, context)
+    ACCOUNTS.disqualified_accounts.add(update.message.from_user.id)
 
 
 async def count(update: Update, context: ContextTypes):

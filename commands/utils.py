@@ -1,7 +1,8 @@
 from telegram.ext import ContextTypes
 from telegram import Message, Update
 
-from keyboards import CLEANUP
+from data.accounts import ACCOUNTS
+from commands.account import register_account
 
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -31,3 +32,13 @@ async def save_input(
 ) -> str:
     context.user_data[FORM][FIELD] = DATA
     return await context.user_data["NEXT_PHASE"](message, context)
+
+
+def requires_account(func):
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if context._user_id in ACCOUNTS:
+            return await func(update, context)
+        else:
+            return await register_account(update, context)
+
+    return wrapper

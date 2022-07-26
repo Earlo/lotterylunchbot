@@ -13,7 +13,7 @@ from telegram.ext import (
 )
 
 from commands.general import (
-    register_account,
+    home,
     count,
     skip,
     raffle_pairs,
@@ -21,7 +21,7 @@ from commands.general import (
     debug_raffle_pairs,
     inline_menu,
 )
-from commands.pool import create_pool, choose
+from commands.pool import create_pool, choose, join_pool
 from commands.utils import save_text_input, save_button_input
 
 from utils import time_until
@@ -54,21 +54,21 @@ def main():
     # Get the dispatcher to register handlers
     conv_handler = ConversationHandler(
         entry_points=[
-            CommandHandler("start", register_account),
+            CommandHandler("start", home),
             CommandHandler("count", count),
             CommandHandler("skip", skip),
             CommandHandler("debugraffle", debug_raffle_pairs),
         ],
         states={},
-        fallbacks=[CommandHandler("start", register_account)],
+        fallbacks=[CommandHandler("start", home)],
         per_message=False,
         per_user=True,
     )
 
-    # Get the dispatcher to register handlers
     pool_handler = ConversationHandler(
         entry_points=[
             CommandHandler("create_pool", create_pool),
+            CommandHandler("join", join_pool),
         ],
         states={
             "SELECTING": [CallbackQueryHandler(save_button_input)],
@@ -78,7 +78,7 @@ def main():
             "CONFIRM": [CallbackQueryHandler(choose)],
             "DONE": [],
         },
-        fallbacks=[CommandHandler("start", register_account)],
+        fallbacks=[CommandHandler("start", home)],
         per_message=False,
         per_user=True,
     )
