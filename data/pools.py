@@ -24,7 +24,6 @@ class Pools(metaclass=Singleton):
                     ON CONFLICT (id) DO UPDATE SET name = %s, description = %s, public = %s, updated_at = %s
                     RETURNING *;
                     """
-                print(1)
                 cur.execute(
                     query,
                     (
@@ -39,7 +38,6 @@ class Pools(metaclass=Singleton):
                         datetime.now(),
                     ),
                 )
-                print(2)
                 return cur.fetchone()
 
     def append(self, data):

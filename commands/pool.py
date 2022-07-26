@@ -148,12 +148,10 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             return await check(query.message, context)
     elif user_data["CHOICE"] == "submit_pool":
         if DATA == "True":
-            print("0", user_data["POOL"])
             if user_data["POOL"]["id"]:
                 pool = POOLS[user_data["POOL"]["id"]] = user_data["POOL"]
             else:
                 pool = POOLS.append(user_data["POOL"])
-            print("poo", pool)
             POOL_MEMBERS.append(context._user_id, pool["id"], True)
             await update.callback_query.edit_message_text(
                 text=CREATE_POOL5.format(
