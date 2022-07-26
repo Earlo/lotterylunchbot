@@ -6,7 +6,7 @@ from datetime import datetime
 from singleton import Singleton
 
 
-class AccountsPools(metaclass=Singleton):
+class PoolMembers(metaclass=Singleton):
     def __init__(self):
         pass
 
@@ -35,7 +35,7 @@ class AccountsPools(metaclass=Singleton):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 try:
-                    query = f"""INSERT INTO accountsPools (
+                    query = f"""INSERT INTO poolMembers (
                         account,
                         pool,
                         admin,
@@ -60,7 +60,7 @@ class AccountsPools(metaclass=Singleton):
             with con.cursor() as cur:
                 # cur.execute("drop table if exists accountsPools CASCADE;")
                 cur.execute(
-                    """CREATE TABLE IF NOT EXISTS accountsPools (
+                    """CREATE TABLE IF NOT EXISTS poolMembers (
                     account INTEGER REFERENCES accounts(id),
                     pool INTEGER REFERENCES pools(id),
                     admin BOOLEAN DEFAULT FALSE,
@@ -71,4 +71,4 @@ class AccountsPools(metaclass=Singleton):
                 )
 
 
-ACCOUNTS_POOLS = AccountsPools()
+POOL_MEMBERS = PoolMembers()

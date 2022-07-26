@@ -20,6 +20,7 @@ MISS = """Sorry, you were the odd one out today and we couldn't find you a lunch
 OPTIONS = """Hello *{}*,
 You are in lottery pools: 
 {}
+
 You're availeable for lunch on:
 {}
 """

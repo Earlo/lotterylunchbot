@@ -99,7 +99,7 @@ class Accounts(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                # cur.execute("drop table if exists users cascade")
+                # cur.execute("drop table if exists accounts cascade")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS accounts (
                     id INTEGER PRIMARY KEY,

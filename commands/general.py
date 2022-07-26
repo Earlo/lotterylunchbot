@@ -95,7 +95,8 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return await query.delete_message()
 
     await query.edit_message_text(
-        text=f"Selected option: {query.data}",
+        text=f"""View not implemented yet\.
+        Selected option: {query.data}""",
         reply_markup=OPTIONS_KEYBOARD,
     )
 
@@ -105,21 +106,16 @@ async def profile_menu(query: CallbackQuery, update: Update) -> None:
     pools_in = POOLS.pools_in(account["id"])
     await query.edit_message_text(
         text=OPTIONS.format(
-            account["first_name"],
-            escape_markdown(
-                "\n".join(
-                    [
-                        POOL_LIST.format(
-                            "🌐" if p["public"] else "🔐",
-                            p["name"],
-                            f"{p['count']} members."
-                            if p["count"] > 1
-                            else "Just you 😔",
-                        )
-                        for p in pools_in
-                    ]
-                ),
-                version=2,
+            escape_markdown(account["first_name"], version=2),
+            "\n".join(
+                [
+                    POOL_LIST.format(
+                        "🌐" if p["public"] else "🔐",
+                        escape_markdown(p["name"], version=2),
+                        f"{p['count']} members\." if p["count"] > 1 else "Just you 😔",
+                    )
+                    for p in pools_in
+                ]
             ),
             "WIP",
         ),

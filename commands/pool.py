@@ -1,6 +1,6 @@
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
-from data.accountsPools import ACCOUNTS_POOLS
+from data.poolMembers import POOL_MEMBERS
 
 from telegram.helpers import escape_markdown
 
@@ -30,7 +30,7 @@ async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             reply_markup=OK_KEYBOARD,
         )
     else:
-        response = ACCOUNTS_POOLS.append(context._user_id, pool["id"])
+        response = POOL_MEMBERS.append(context._user_id, pool["id"])
         if response == None:
             await update.message.reply_markdown_v2(
                 text=JOIN_POOL_ALREADY_MEMBER.format(
@@ -59,7 +59,7 @@ async def leave_pool(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=OK_KEYBOARD,
         )
     else:
-        response = ACCOUNTS_POOLS.remove(context._user_id, pool["id"])
+        response = POOL_MEMBERS.remove(context._user_id, pool["id"])
         if response == None:
             await update.message.reply_markdown_v2(
                 text=LEAVE_POOL_NOT_MEMBER.format(
@@ -109,7 +109,7 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     elif user_data["CHOICE"] == "submit_pool":
         if DATA == "True":
             new_pool = POOLS.append(user_data["POOL"])
-            ACCOUNTS_POOLS.append(context._user_id, new_pool["id"], True)
+            POOL_MEMBERS.append(context._user_id, new_pool["id"], True)
             await update.callback_query.edit_message_text(
                 text=CREATE_POOL5.format(
                     escape_markdown(user_data["POOL"]["name"], version=2),

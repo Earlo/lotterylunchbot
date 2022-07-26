@@ -71,10 +71,10 @@ class Pools(metaclass=Singleton):
                         account as admin, 
                         count(*) as member_count
                     FROM
-                    pools JOIN accountsPools ON pools.id = accountsPools.pool
+                    pools JOIN poolMembers ON pools.id = poolMembers.pool
                     WHERE
                     admin = true AND
-                    accountsPools.pool = %s GROUP BY pools.id, accountsPools.account;""",
+                    poolMembers.pool = %s GROUP BY pools.id, poolMembers.account;""",
                     (pool_id,),
                 )
                 result = cur.fetchone()
@@ -115,9 +115,9 @@ class Pools(metaclass=Singleton):
                     """SELECT 
                         pools.public, pools.name, count(*) 
                         FROM 
-                        pools JOIN accountsPools ON pools.id = accountsPools.pool 
+                        pools JOIN poolMembers ON pools.id = poolMembers.pool 
                         WHERE
-                        accountsPools.account = %s GROUP BY pools.name;""",
+                        poolMembers.account = %s GROUP BY pools.id;""",
                     (account_id,),
                 )
                 return cur.fetchall()

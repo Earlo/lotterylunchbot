@@ -1,7 +1,7 @@
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
 from data.schedules import SCHEDULES
-from data.accountsPools import ACCOUNTS_POOLS
+from data.poolMembers import POOL_MEMBERS
 
 from telegram.ext import (
     Application,
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     ACCOUNTS.check_db()
     POOLS.check_db()
     SCHEDULES.check_db()
-    ACCOUNTS_POOLS.check_db()
+    POOL_MEMBERS.check_db()
 
     main()
