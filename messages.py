@@ -28,7 +28,7 @@ You're availeable for lunch on:
 POOL_LIST = """{} *{}* has {}\."""
 
 POOL_OPTIONS = """Hello *{}*,
-Here are the public pools\. Join any by clicking them\.
+Here are the public pools\.
 
 If you've been asked to join a private pool, use 
 `\/join <pool_name>`

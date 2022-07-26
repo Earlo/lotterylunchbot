@@ -6,10 +6,17 @@ from telegram.helpers import escape_markdown
 
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
+from data.poolMembers import POOL_MEMBERS
 
 from messages import *
 from utils import check_accounts
-from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOARD
+from keyboards import (
+    HOMEKEYBOARD,
+    OPTIONS_KEYBOARD,
+    POOLS_KEYBOARD,
+    OK_KEYBOARD,
+    POOL_KEYBOARD,
+)
 from commands.utils import requires_account
 
 
@@ -84,13 +91,23 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     query = update.callback_query
 
     await query.answer()
-    selected = query.data.split(":")[0]
+    options = query.data.split(":")
+    selected = options[0]
     if selected == "profile":
         return await profile_menu(query, update)
     elif selected == "pools_menu":
         return await pools_menu(query, update)
     elif selected == "pool_menu":
-        return await pool_menu(query, update, pool_id=query.data.split(":")[1])
+        pool_id = int(options[1])
+        if len(options) > 2:
+            action = options[2]
+            if action == "join":
+                POOL_MEMBERS.append(query.from_user.id, pool_id)
+            elif action == "leave":
+                ret = POOL_MEMBERS.remove_from(query.from_user.id, pool_id)
+                print("rere", ret)
+        return await pool_menu(query, update, pool_id)
+
     elif selected == "delete":
         return await query.delete_message()
 
@@ -135,15 +152,21 @@ async def pools_menu(query: CallbackQuery, update: Update) -> None:
 
 
 async def pool_menu(query: CallbackQuery, update: Update, pool_id: int) -> None:
+    user_id = query.from_user.id
     pool = POOLS[pool_id]
+    is_member, is_admin, count = POOL_MEMBERS.get_meta(user_id, pool["id"])
     await query.edit_message_text(
         text=POOL_DESCRIPTION.format(
             escape_markdown(pool["name"], version=2),
             escape_markdown(pool["description"], version=2),
             "The group is public\." if pool["public"] else "The group is private\.",
-            pool["member_count"],
-            "You're the admin" if pool["admin"] == query.from_user.id else "",
+            count,
+            "You're the admin"
+            if is_admin
+            else "You're a member"
+            if is_member
+            else "You're not a member",
         ),
-        reply_markup=POOLS_KEYBOARD(),
+        reply_markup=POOL_KEYBOARD(pool, is_member, is_admin),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )

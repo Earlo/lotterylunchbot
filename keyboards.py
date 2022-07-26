@@ -73,12 +73,44 @@ def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
         [
             [
                 InlineKeyboardButton(
-                    pool["name"], callback_data=f"pool_menu:{pool['id']}"
+                    f"View {pool['name']}", callback_data=f"pool_menu:{pool['id']}"
                 )
                 for pool in POOLS.public_pools()
             ],
             [
                 InlineKeyboardButton("Back", callback_data="profile"),
+            ],
+        ]
+    )
+
+
+def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    f"{'Leave' if is_member else 'Join'} {pool['name']}",
+                    callback_data=f"pool_menu:{pool['id']}:{'leave' if is_member else 'join'}",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    f"Edit title",
+                    callback_data=f"pool_menu:{pool['id']}:edit:title",
+                ),
+                InlineKeyboardButton(
+                    f"Edit description",
+                    callback_data=f"pool_menu:{pool['id']}:edit:description",
+                ),
+                InlineKeyboardButton(
+                    f"Make {'private' if pool['public'] else 'public'}",
+                    callback_data=f"pool_menu:{pool['id']}:edit:public:{not pool['public']}",
+                ),
+            ]
+            if is_admin
+            else [],
+            [
+                InlineKeyboardButton("Back", callback_data="pools_menu"),
             ],
         ]
     )
