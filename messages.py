@@ -9,12 +9,12 @@ Lunch Lottery is conducted every day at {}\."""
 TALLY = """There are {} people using this bot\!"""
 
 REMINDER = """Lunch Lottery is conducted at {}\.
-If you don't want to take part to the next lunch pairing, use \/skip"""
+If you don't want to take part to the next lunch pairing, use `\/skip`\."""
 
 LUNCH = """Today you'll be having lunch with @{}\!
 Send them a message\!"""
 
-MISS = """Sorry, you were the odd one out today :("""
+MISS = """Sorry, you were the odd one out today and we couldn't find you a lunch partner :("""
 
 
 OPTIONS = """Hello *{}*,
@@ -24,7 +24,7 @@ You're availeable for lunch on:
 {}
 """
 
-POOL_LIST = """{} *{}* has {} members\."""
+POOL_LIST = """{} *{}* has {}\."""
 
 POOL_OPTIONS = """Hello *{}*,
 Here are the public pools\. Join any by clicking them\.
@@ -34,6 +34,15 @@ If you've been asked to join a private pool, use
 
 To create a new pool use
 `\/create_pool`
+"""
+
+POOL_DESCRIPTION = """*{}*
+_{}_
+
+Public: {}
+
+Members: {}
+{}
 """
 
 

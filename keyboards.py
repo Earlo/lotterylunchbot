@@ -4,7 +4,7 @@ from data.pools import POOLS
 CLEANUP = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("🧹", callback_data="close"),
+            InlineKeyboardButton("🧹", callback_data="delete"),
         ],
     ]
 )
@@ -12,7 +12,7 @@ CLEANUP = InlineKeyboardMarkup(
 OK_KEYBOARD = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("Ok", callback_data="close"),
+            InlineKeyboardButton("Ok", callback_data="delete"),
         ],
     ]
 )
@@ -72,7 +72,9 @@ def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton(pool["name"], callback_data=pool["name"])
+                InlineKeyboardButton(
+                    pool["name"], callback_data=f"pool_menu:{pool['id']}"
+                )
                 for pool in POOLS.public_pools()
             ],
             [

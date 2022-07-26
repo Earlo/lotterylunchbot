@@ -1,15 +1,15 @@
+from multiprocessing import context
 import os
+from telegram import Update, CallbackQuery, constants
+from telegram.ext import ContextTypes, CallbackContext
+from telegram.helpers import escape_markdown
 
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
 
 from messages import *
 from utils import check_accounts
-
 from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOARD
-from telegram import Update, CallbackQuery, constants
-from telegram.ext import ContextTypes, CallbackContext
-from telegram.helpers import escape_markdown
 from commands.utils import requires_account
 
 
@@ -57,25 +57,21 @@ async def raffle_pairs(context: CallbackContext):
                     text=MISS,
                     reply_markup=OK_KEYBOARD,
                 )
-
             except:
                 await context.bot.send_message(
                     chat_id=b,
                     text=MISS,
                     reply_markup=OK_KEYBOARD,
                 )
-
         else:
             await context.bot.send_message(
                 chat_id=a,
                 text=LUNCH.format(escape_markdown(ACCOUNTS[b]["username"], version=2)),
             )
-
             await context.bot.send_message(
                 chat_id=b,
                 text=LUNCH.format(escape_markdown(ACCOUNTS[a]["username"], version=2)),
             )
-
     ACCOUNTS.reset()
 
 
@@ -88,11 +84,14 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     query = update.callback_query
 
     await query.answer()
-    if query.data == "profile":
+    selected = query.data.split(":")[0]
+    if selected == "profile":
         return await profile_menu(query, update)
-    elif query.data == "pools_menu":
+    elif selected == "pools_menu":
         return await pools_menu(query, update)
-    elif query.data == "close":
+    elif selected == "pool_menu":
+        return await pool_menu(query, update, pool_id=query.data.split(":")[1])
+    elif selected == "delete":
         return await query.delete_message()
 
     await query.edit_message_text(
@@ -107,15 +106,20 @@ async def profile_menu(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
         text=OPTIONS.format(
             account["first_name"],
-            "\n".join(
-                [
-                    POOL_LIST.format(
-                        "🌐" if p["public"] else "🔐",
-                        p["name"],
-                        p["count"] if p["count"] > 1 else "Just you 😔",
-                    )
-                    for p in pools_in
-                ]
+            escape_markdown(
+                "\n".join(
+                    [
+                        POOL_LIST.format(
+                            "🌐" if p["public"] else "🔐",
+                            p["name"],
+                            f"{p['count']} members."
+                            if p["count"] > 1
+                            else "Just you 😔",
+                        )
+                        for p in pools_in
+                    ]
+                ),
+                version=2,
             ),
             "WIP",
         ),
@@ -128,6 +132,21 @@ async def pools_menu(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
         text=POOL_OPTIONS.format(
             escape_markdown(query.from_user.first_name, version=2)
+        ),
+        reply_markup=POOLS_KEYBOARD(),
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
+    )
+
+
+async def pool_menu(query: CallbackQuery, update: Update, pool_id: int) -> None:
+    pool = POOLS[pool_id]
+    await query.edit_message_text(
+        text=POOL_DESCRIPTION.format(
+            escape_markdown(pool["name"], version=2),
+            escape_markdown(pool["description"], version=2),
+            "The group is public\." if pool["public"] else "The group is private\.",
+            pool["member_count"],
+            "You're the admin" if pool["admin"] == query.from_user.id else "",
         ),
         reply_markup=POOLS_KEYBOARD(),
         parse_mode=constants.ParseMode.MARKDOWN_V2,

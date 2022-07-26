@@ -1,6 +1,7 @@
 import os
 
 from datetime import datetime
+from unittest import result
 from singleton import Singleton
 
 import psycopg2
@@ -60,11 +61,25 @@ class Pools(metaclass=Singleton):
                 )
                 return cur.fetchone()
 
-    def __getitem__(self, i: int):
+    def __getitem__(self, pool_id: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute("""SELECT * FROM pools WHERE id = %s;""", (i,))
-                return cur.fetchone()
+                # TODO add support for multiple admins
+                cur.execute(
+                    """SELECT
+                        pools.*,
+                        account as admin, 
+                        count(*) as member_count
+                    FROM
+                    pools JOIN accountsPools ON pools.id = accountsPools.pool
+                    WHERE
+                    admin = true AND
+                    accountsPools.pool = %s GROUP BY pools.id, accountsPools.account;""",
+                    (pool_id,),
+                )
+                result = cur.fetchone()
+                print("result", result)
+                return result
 
     def get_by_name(self, name: str):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
@@ -102,7 +117,7 @@ class Pools(metaclass=Singleton):
                         FROM 
                         pools JOIN accountsPools ON pools.id = accountsPools.pool 
                         WHERE
-                        accountsPools.account = %s GROUP BY pools.public, pools.name;""",
+                        accountsPools.account = %s GROUP BY pools.name;""",
                     (account_id,),
                 )
                 return cur.fetchall()

@@ -1,5 +1,3 @@
-from http.client import responses
-from sqlalchemy import true
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
 from data.accountsPools import ACCOUNTS_POOLS
@@ -29,6 +27,7 @@ async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     if pool == None:
         await update.message.reply_markdown_v2(
             text=JOIN_POOL_FAIL.format(escape_markdown(pool_name, version=2)),
+            reply_markup=OK_KEYBOARD,
         )
     else:
         response = ACCOUNTS_POOLS.append(context._user_id, pool["id"])
@@ -37,10 +36,12 @@ async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
                 text=JOIN_POOL_ALREADY_MEMBER.format(
                     escape_markdown(pool_name, version=2)
                 ),
+                reply_markup=OK_KEYBOARD,
             )
         else:
             await update.message.reply_markdown_v2(
                 text=JOIN_POOL_SUCCESS.format(escape_markdown(pool_name, version=2)),
+                reply_markup=OK_KEYBOARD,
             )
     return -1
 
@@ -49,11 +50,13 @@ async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def leave_pool(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return -1
     # NOT IMPLEMENTED
+
     pool_name = update.message.text.split(" ")[1]
     pool = POOLS.get_by_name(pool_name)
     if pool == None:
         await update.message.reply_markdown_v2(
             text=LEAVE_POOL_FAIL.format(escape_markdown(pool_name, version=2)),
+            reply_markup=OK_KEYBOARD,
         )
     else:
         response = ACCOUNTS_POOLS.remove(context._user_id, pool["id"])
@@ -62,10 +65,12 @@ async def leave_pool(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=LEAVE_POOL_NOT_MEMBER.format(
                     escape_markdown(pool_name, version=2)
                 ),
+                reply_markup=OK_KEYBOARD,
             )
         else:
             await update.message.reply_markdown_v2(
                 text=LEAVE_POOL_SUCCESS.format(escape_markdown(pool_name, version=2)),
+                reply_markup=OK_KEYBOARD,
             )
     return -1
 
