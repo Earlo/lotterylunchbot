@@ -40,7 +40,6 @@ class Pools(metaclass=Singleton):
                 con.commit()
 
     def append(self, data):
-        print("Appending to pools", data)
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 query = f"""INSERT INTO pools (
@@ -59,9 +58,7 @@ class Pools(metaclass=Singleton):
                         datetime.now(),
                     ),
                 )
-                value = cur.fetchone()
-                print("ret", value)
-                return value
+                return cur.fetchone()
 
     def __getitem__(self, i: int):
         pass
@@ -94,9 +91,9 @@ class Pools(metaclass=Singleton):
                     """SELECT 
                         pools.public, pools.name, count(*) 
                         FROM 
-                        pools JOIN accountsPools ON pools.id = accountsPools.pool_id 
+                        pools JOIN accountsPools ON pools.id = accountsPools.pool 
                         WHERE
-                        accountsPools.account_id = %s GROUP BY pools.public, pools.name;""",
+                        accountsPools.account = %s GROUP BY pools.public, pools.name;""",
                     (account_id,),
                 )
                 return cur.fetchall()

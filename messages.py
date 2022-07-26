@@ -24,7 +24,7 @@ You're availeable for lunch on:
 {}
 """
 
-POOL_LIST = """{} *{}* has {} members\.\n"""
+POOL_LIST = """{} *{}* has {} members\."""
 
 POOL_OPTIONS = """Hello *{}*,
 Here are the public pools\. Join any by clicking them\.

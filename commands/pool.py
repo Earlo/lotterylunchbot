@@ -59,7 +59,6 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     elif user_data["CHOICE"] == "submit_pool":
         if DATA == "True":
             new_pool = POOLS.append(user_data["POOL"])
-            print("got new pool:", new_pool)
             ACCOUNTS_POOLS.append(context._user_id, new_pool["id"], True)
             await update.callback_query.edit_message_text(
                 text=CREATE_POOL5.format(
@@ -70,7 +69,7 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
                 reply_markup=OK_KEYBOARD,
             )
-        return "HOME"
+        return -1
 
 
 async def add_name(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:

@@ -31,12 +31,12 @@ class AccountsPools(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
-    def append(self, account_id: int, pool_id: int, admin: bool = False):
+    def append(self, account: int, pool: int, admin: bool = False):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 query = f"""INSERT INTO accountsPools (
-                    account_id,
-                    pool_id,
+                    account,
+                    pool,
                     admin,
                     created
                     ) VALUES (%s, %s, %s, %s) 
@@ -44,8 +44,8 @@ class AccountsPools(metaclass=Singleton):
                 cur.execute(
                     query,
                     (
-                        account_id,
-                        pool_id,
+                        account,
+                        pool,
                         admin,
                         datetime.now(),
                     ),
@@ -58,12 +58,12 @@ class AccountsPools(metaclass=Singleton):
                 # cur.execute("drop table if exists accountsPools CASCADE;")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS accountsPools (
-                    account_id INTEGER REFERENCES accounts(id),
-                    pool_id INTEGER REFERENCES pools(id),
+                    account INTEGER REFERENCES accounts(id),
+                    pool INTEGER REFERENCES pools(id),
                     admin BOOLEAN DEFAULT FALSE,
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    CONSTRAINT unique_account_pool UNIQUE (account_id, pool_id),
-                    PRIMARY KEY (account_id, pool_id)
+                    CONSTRAINT unique_account_pool UNIQUE (account, pool),
+                    PRIMARY KEY (account, pool)
                 );"""
                 )
 

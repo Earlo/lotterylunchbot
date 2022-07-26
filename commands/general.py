@@ -123,7 +123,9 @@ async def profile_menu(query: CallbackQuery, update: Update) -> None:
             "\n".join(
                 [
                     POOL_LIST.format(
-                        "🔐" if p["public"] == "True" else "🌐", p["name"], p["count"]
+                        "🌐" if p["public"] else "🔐",
+                        p["name"],
+                        p["count"] if p["count"] > 1 else "Just you 😔",
                     )
                     for p in pools_in
                 ]
