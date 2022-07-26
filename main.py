@@ -1,7 +1,7 @@
-from data.users import USERS
+from data.accounts import ACCOUNTS
 from data.pools import POOLS
 from data.schedules import SCHEDULES
-from data.usersPools import USERS_POOLS
+from data.accountsPools import ACCOUNTS_POOLS
 
 from telegram.ext import (
     Application,
@@ -13,7 +13,7 @@ from telegram.ext import (
 )
 
 from commands.general import (
-    register_user,
+    register_account,
     count,
     skip,
     raffle_pairs,
@@ -54,13 +54,13 @@ def main():
     # Get the dispatcher to register handlers
     conv_handler = ConversationHandler(
         entry_points=[
-            CommandHandler("start", register_user),
+            CommandHandler("start", register_account),
             CommandHandler("count", count),
             CommandHandler("skip", skip),
             CommandHandler("debugraffle", debug_raffle_pairs),
         ],
         states={},
-        fallbacks=[CommandHandler("start", register_user)],
+        fallbacks=[CommandHandler("start", register_account)],
         per_message=False,
         per_user=True,
     )
@@ -78,7 +78,7 @@ def main():
             "CONFIRM": [CallbackQueryHandler(choose)],
             "DONE": [],
         },
-        fallbacks=[CommandHandler("start", register_user)],
+        fallbacks=[CommandHandler("start", register_account)],
         per_message=False,
         per_user=True,
     )
@@ -108,9 +108,9 @@ def main():
 
 if __name__ == "__main__":
     # init tables
-    USERS.check_db()
+    ACCOUNTS.check_db()
     POOLS.check_db()
     SCHEDULES.check_db()
-    USERS_POOLS.check_db()
+    ACCOUNTS_POOLS.check_db()
 
     main()

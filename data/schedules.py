@@ -35,7 +35,7 @@ class Schedules(metaclass=Singleton):
             with con.cursor() as cur:
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS schedules (
-                    owner INTEGER REFERENCES users(id),
+                    owner INTEGER REFERENCES accounts(id),
                     pool INTEGER REFERENCES pools(id),
                     weekday VARCHAR(8),
                     start_time TIME NOT NULL,

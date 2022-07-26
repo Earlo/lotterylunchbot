@@ -1,5 +1,3 @@
-import os
-
 GREETING_NEW = """Hello {}\!
 You seem to be a new user\!
 You are now part of upcoming lunch lotteries\.
@@ -20,10 +18,14 @@ MISS = """Sorry, you were the odd one out today :("""
 
 
 OPTIONS = """Hello *{}*,
-You are in lottery pools: {}
+You are in lottery pools: 
+{}
 You're availeable for lunch on:
 {}
 """
+
+POOL_LIST = """{} *{}* has {} members\.\n"""
+
 POOL_OPTIONS = """Hello *{}*,
 Here are the public pools\. Join any by clicking them\.
 

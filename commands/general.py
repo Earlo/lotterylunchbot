@@ -1,7 +1,10 @@
-from data.users import USERS
+import os
+
+from data.accounts import ACCOUNTS
+from data.pools import POOLS
 
 from messages import *
-from utils import check_users
+from utils import check_accounts
 
 from keyboards import HOMEKEYBOARD, OPTIONS_KEYBOARD, POOLS_KEYBOARD, OK_KEYBOARD
 from telegram import Update, CallbackQuery, constants
@@ -9,20 +12,20 @@ from telegram.ext import ContextTypes, CallbackContext
 from telegram.helpers import escape_markdown
 
 
-async def register_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    userid = str(update.message.from_user.id)
-    if userid in USERS:
-        user = USERS[userid]
-        await update.message.reply_text(
+async def register_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    userid = update.message.from_user.id
+    if userid in ACCOUNTS:
+        account = ACCOUNTS[userid]
+        await update.message.reply_markdown_v2(
             text=GREETING.format(
-                escape_markdown(user["first_name"], version=2),
+                escape_markdown(account["first_name"], version=2),
                 os.environ.get("LOTTERY_AT"),
             ),
             reply_markup=HOMEKEYBOARD,
         )
     else:
-        USERS[userid] = update.message.from_user
-        await update.message.reply_text(
+        ACCOUNTS[userid] = update.message.from_user
+        await update.message.reply_markdown_v2(
             text=GREETING_NEW.format(
                 escape_markdown(update.message.from_user.first_name, version=2)
             ),
@@ -31,25 +34,25 @@ async def register_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
 
 async def skip(update: Update, context: ContextTypes):
-    userid = str(update.message.from_user.id)
-    if userid in USERS:
-        USERS.disqualified_users.add(userid)
+    userid = update.message.from_user.id
+    if userid in ACCOUNTS:
+        ACCOUNTS.disqualified_accounts.add(userid)
     else:
-        # user not registered, register first, then skip today
-        register_user(update, context)
+        # account not registered, register first, then skip today
+        register_account(update, context)
         skip(update, context)
 
 
 async def count(update: Update, context: ContextTypes):
-    await check_users(context)
-    await update.message.reply_text(
-        text=TALLY.format(len(USERS)),
+    await check_accounts(context)
+    await update.message.reply_markdown_v2(
+        text=TALLY.format(len(ACCOUNTS)),
     )
 
 
 async def remind(context: CallbackContext):
-    await check_users(context)
-    for u in USERS:
+    await check_accounts(context)
+    for u in ACCOUNTS:
         await context.bot.send_message(
             chat_id=u,
             text=REMINDER.format(os.environ.get("LOTTERY_AT")),
@@ -58,8 +61,8 @@ async def remind(context: CallbackContext):
 
 
 async def raffle_pairs(context: CallbackContext):
-    await check_users(context)
-    for a, b in USERS.get_pairs():
+    await check_accounts(context)
+    for a, b in ACCOUNTS.get_pairs():
         if a == None or b == None:
             try:
                 await context.bot.send_message(
@@ -78,15 +81,15 @@ async def raffle_pairs(context: CallbackContext):
         else:
             await context.bot.send_message(
                 chat_id=a,
-                text=LUNCH.format(escape_markdown(USERS[b]["username"], version=2)),
+                text=LUNCH.format(escape_markdown(ACCOUNTS[b]["username"], version=2)),
             )
 
             await context.bot.send_message(
                 chat_id=b,
-                text=LUNCH.format(escape_markdown(USERS[a]["username"], version=2)),
+                text=LUNCH.format(escape_markdown(ACCOUNTS[a]["username"], version=2)),
             )
 
-    USERS.reset()
+    ACCOUNTS.reset()
 
 
 async def debug_raffle_pairs(update: Update, context: ContextTypes):
@@ -98,9 +101,9 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     query = update.callback_query
 
     await query.answer()
-    if query.data == "options":
-        return await options_menu(query, update)
-    elif query.data == "pools":
+    if query.data == "profile":
+        return await profile_menu(query, update)
+    elif query.data == "pools_menu":
         return await pools_menu(query, update)
     elif query.data == "close":
         return await query.delete_message()
@@ -111,9 +114,25 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     )
 
 
-async def options_menu(query: CallbackQuery, update: Update) -> None:
-    user = USERS[query.from_user.id]
-    await query.edit_message_text(text=f"{user}", reply_markup=OPTIONS_KEYBOARD)
+async def profile_menu(query: CallbackQuery, update: Update) -> None:
+    account = ACCOUNTS[query.from_user.id]
+    pools_in = POOLS.pools_in(account["id"])
+    await query.edit_message_text(
+        text=OPTIONS.format(
+            account["first_name"],
+            "\n".join(
+                [
+                    POOL_LIST.format(
+                        "🔐" if p["public"] == "True" else "🌐", p["name"], p["count"]
+                    )
+                    for p in pools_in
+                ]
+            ),
+            "WIP",
+        ),
+        reply_markup=OPTIONS_KEYBOARD,
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
+    )
 
 
 async def pools_menu(query: CallbackQuery, update: Update) -> None:

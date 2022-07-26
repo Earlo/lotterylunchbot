@@ -1,20 +1,20 @@
-from datetime import datetime
-from random import shuffle
 import os
-from singleton import Singleton
-
 import psycopg2
 import psycopg2.extras
 
+from datetime import datetime
+from random import shuffle
+from singleton import Singleton
 
-class Users(metaclass=Singleton):
+
+class Accounts(metaclass=Singleton):
     def __init__(self):
         pass
 
     def __setitem__(self, i: int, data):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                query = f"""INSERT INTO users (
+                query = f"""INSERT INTO accounts (
                     id,
                     username,
                     first_name,
@@ -41,7 +41,7 @@ class Users(metaclass=Singleton):
     def __getitem__(self, i: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute("""SELECT * FROM users WHERE id = %s""", (i,))
+                cur.execute("""SELECT * FROM accounts WHERE id = %s""", (i,))
                 return cur.fetchone()
 
     def __iter__(self):
@@ -49,29 +49,29 @@ class Users(metaclass=Singleton):
             with con.cursor() as cur:
                 cur.execute(
                     """SELECT id
-                    FROM users
+                    FROM accounts
                     ORDER BY joined DESC
                     """
                 )
-                for user in cur.fetchall():
-                    yield user[0]
+                for account in cur.fetchall():
+                    yield account[0]
 
     def __contains__(self, item):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute("""SELECT * FROM users WHERE id = %s""", (item,))
+                cur.execute("""SELECT * FROM accounts WHERE id = %s""", (item,))
                 return cur.fetchone() is not None
 
     def __len__(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute("""SELECT COUNT(*) FROM users""")
+                cur.execute("""SELECT COUNT(*) FROM accounts""")
                 return cur.fetchone()[0]
 
     def __delitem__(self, key):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute("""DELETE FROM users WHERE id = %s""", (key,))
+                cur.execute("""DELETE FROM accounts WHERE id = %s""", (key,))
 
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
@@ -79,7 +79,7 @@ class Users(metaclass=Singleton):
     def get_qualified(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                cur.execute("""SELECT id FROM users WHERE disqualified = FALSE""")
+                cur.execute("""SELECT id FROM accounts WHERE disqualified = FALSE""")
                 return [x[0] for x in cur.fetchall()]
 
     def get_pairs(self):
@@ -91,7 +91,7 @@ class Users(metaclass=Singleton):
         return pairs
 
     def reset(self):
-        self.disqualified_users = set()
+        self.disqualified_accounts = set()
 
     def save(self):
         pass
@@ -99,8 +99,9 @@ class Users(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
+                # cur.execute("drop table if exists users cascade")
                 cur.execute(
-                    """CREATE TABLE IF NOT EXISTS users (
+                    """CREATE TABLE IF NOT EXISTS accounts (
                     id INTEGER PRIMARY KEY,
                     first_name TEXT,
                     last_name TEXT,
@@ -113,4 +114,4 @@ class Users(metaclass=Singleton):
                 )
 
 
-USERS = Users()
+ACCOUNTS = Accounts()

@@ -1,5 +1,7 @@
-from data.users import USERS
+from sqlalchemy import true
+from data.accounts import ACCOUNTS
 from data.pools import POOLS
+from data.accountsPools import ACCOUNTS_POOLS
 
 from telegram.helpers import escape_markdown
 
@@ -16,26 +18,24 @@ from telegram import (
 )
 from telegram.ext import ContextTypes, CallbackContext
 
-from commands.general import register_user
+from commands.general import register_account
 
 
 async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    userid = str(update.message.from_user.id)
-    if userid in USERS:
-        user = USERS[userid]
-        await update.message.reply_text(
-            text=CREATE_POOL0.format(escape_markdown(user["first_name"]), version=2),
-            parse_mode=constants.ParseMode.MARKDOWN_V2,
+    userid = context._user_id
+    if userid in ACCOUNTS:
+        account = ACCOUNTS[userid]
+        await update.message.reply_markdown_v2(
+            text=CREATE_POOL0.format(escape_markdown(account["first_name"]), version=2),
         )
-        user_data = context.user_data
-        user_data["FORM"] = "POOL"
-        user_data["POOL"] = {"owner": userid}
-        user_data["CURRENT_FEATURE"] = "name"
-        user_data["NEXT_PHASE"] = add_name
+        context.user_data["FORM"] = "POOL"
+        context.user_data["POOL"] = {}
+        context.user_data["CURRENT_FEATURE"] = "name"
+        context.user_data["NEXT_PHASE"] = add_name
         return "TYPING"
     else:
         # Not registered, register first
-        register_user(update, context)
+        await register_account(update, context)
 
 
 async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -54,10 +54,13 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             user_data["NEXT_PHASE"] = check
             return "TYPING"
         else:
-            return await check(query.message)
+            user_data["POOL"]["description"] = ""
+            return await check(query.message, context)
     elif user_data["CHOICE"] == "submit_pool":
         if DATA == "True":
-            POOLS.append(user_data["POOL"])
+            new_pool = POOLS.append(user_data["POOL"])
+            print("got new pool:", new_pool)
+            ACCOUNTS_POOLS.append(context._user_id, new_pool["id"], True)
             await update.callback_query.edit_message_text(
                 text=CREATE_POOL5.format(
                     escape_markdown(user_data["POOL"]["name"], version=2),

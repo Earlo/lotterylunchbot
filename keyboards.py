@@ -30,8 +30,8 @@ HOMEKEYBOARD = InlineKeyboardMarkup(
 OPTIONS_KEYBOARD = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("Manage pools", callback_data="pools"),
-            InlineKeyboardButton("Manage dates", callback_data="dates"),
+            InlineKeyboardButton("Manage pools", callback_data="pools_menu"),
+            InlineKeyboardButton("Manage dates", callback_data="dates_menu"),
         ],
         [InlineKeyboardButton("Back", callback_data="0")],
     ]
