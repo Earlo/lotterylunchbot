@@ -71,7 +71,10 @@ SUBMIT_CANCEL_KEYBOARD = InlineKeyboardMarkup(
 def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton(pool.name) for pool in POOLS.public_pools()],
+            [
+                InlineKeyboardButton(pool["name"], callback_data=pool["name"])
+                for pool in POOLS.public_pools()
+            ],
             [
                 InlineKeyboardButton("Back", callback_data="profile"),
             ],

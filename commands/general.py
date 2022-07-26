@@ -14,17 +14,17 @@ async def register_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     if userid in USERS:
         user = USERS[userid]
         await update.message.reply_text(
-            text=escape_markdown(
-                GREETING.format(user["first_name"], os.environ.get("LOTTERY_AT")),
-                version=2,
+            text=GREETING.format(
+                escape_markdown(user["first_name"], version=2),
+                os.environ.get("LOTTERY_AT"),
             ),
             reply_markup=HOMEKEYBOARD,
         )
     else:
         USERS[userid] = update.message.from_user
         await update.message.reply_text(
-            text=escape_markdown(
-                GREETING_NEW.format(update.message.from_user.first_name), version=2
+            text=GREETING_NEW.format(
+                escape_markdown(update.message.from_user.first_name, version=2)
             ),
             reply_markup=HOMEKEYBOARD,
         )
@@ -43,7 +43,7 @@ async def skip(update: Update, context: ContextTypes):
 async def count(update: Update, context: ContextTypes):
     await check_users(context)
     await update.message.reply_text(
-        text=escape_markdown(TALLY.format(len(USERS)), version=2)
+        text=TALLY.format(len(USERS)),
     )
 
 
@@ -52,9 +52,7 @@ async def remind(context: CallbackContext):
     for u in USERS:
         await context.bot.send_message(
             chat_id=u,
-            text=escape_markdown(
-                REMINDER.format(os.environ.get("LOTTERY_AT")), version=2
-            ),
+            text=REMINDER.format(os.environ.get("LOTTERY_AT")),
             reply_markup=OK_KEYBOARD,
         )
 
@@ -66,26 +64,26 @@ async def raffle_pairs(context: CallbackContext):
             try:
                 await context.bot.send_message(
                     chat_id=a,
-                    text=escape_markdown(MISS, version=2),
+                    text=MISS,
                     reply_markup=OK_KEYBOARD,
                 )
 
             except:
                 await context.bot.send_message(
                     chat_id=b,
-                    text=escape_markdown(MISS, version=2),
+                    text=MISS,
                     reply_markup=OK_KEYBOARD,
                 )
 
         else:
             await context.bot.send_message(
                 chat_id=a,
-                text=escape_markdown(LUNCH.format(USERS[b]["username"]), version=2),
+                text=LUNCH.format(escape_markdown(USERS[b]["username"], version=2)),
             )
 
             await context.bot.send_message(
                 chat_id=b,
-                text=escape_markdown(LUNCH.format(USERS[a]["username"]), version=2),
+                text=LUNCH.format(escape_markdown(USERS[a]["username"], version=2)),
             )
 
     USERS.reset()
@@ -108,22 +106,20 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return await query.delete_message()
 
     await query.edit_message_text(
-        text=escape_markdown(f"Selected option: {query.data}", version=2),
+        text=f"Selected option: {query.data}",
         reply_markup=OPTIONS_KEYBOARD,
     )
 
 
 async def options_menu(query: CallbackQuery, update: Update) -> None:
     user = USERS[query.from_user.id]
-    await query.edit_message_text(
-        text=escape_markdown(f"{user}", version=2), reply_markup=OPTIONS_KEYBOARD
-    )
+    await query.edit_message_text(text=f"{user}", reply_markup=OPTIONS_KEYBOARD)
 
 
 async def pools_menu(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
-        text=escape_markdown(
-            POOL_OPTIONS.format(query.from_user.first_name), version=2
+        text=POOL_OPTIONS.format(
+            escape_markdown(query.from_user.first_name, version=2)
         ),
         reply_markup=POOLS_KEYBOARD(),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
