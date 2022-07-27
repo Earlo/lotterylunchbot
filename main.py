@@ -23,6 +23,7 @@ from commands.general import (
 )
 from commands.pool import create_pool, choose, join_pool, pool_menu_callbacks
 from commands.utils import save_text_input, save_button_input
+from commands.schedule import schedule_menu_callbacks
 
 from utils import time_until
 from datetime import timedelta
@@ -83,8 +84,26 @@ def main():
         per_user=True,
     )
 
+    schedule_handler = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(schedule_menu_callbacks, pattern="schedule_menu"),
+        ],
+        states={
+            "SELECTING": [CallbackQueryHandler(save_button_input)],
+            "TYPING": [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, save_text_input)
+            ],
+            "CONFIRM": [CallbackQueryHandler(choose)],
+        },
+        fallbacks=[CommandHandler("start", home)],
+        per_message=False,
+        per_user=True,
+    )
+
     application.add_handler(conv_handler)
     application.add_handler(pool_handler)
+
+    application.add_handler(schedule_handler)
 
     application.add_handler(CallbackQueryHandler(inline_menu))
 

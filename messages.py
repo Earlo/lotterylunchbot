@@ -95,3 +95,12 @@ LEAVE_POOL_NOT_MEMBER = """You are not a member of _{}_\."""
 LEAVE_POOL_SUCCESS = """You have left pool _{}_\."""
 
 POOL_EDIT = """Please enter the new {} of your pool\."""
+
+
+SCHEDULE_MENU = """Schedule for *{}*,
+```
+{}
+```
+"""
+
+SCHEDULE_MENU_DATE_LINE = """{}: {}"""

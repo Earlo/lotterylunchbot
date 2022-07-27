@@ -31,7 +31,7 @@ OPTIONS_KEYBOARD = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton("Manage pools", callback_data="pool_menu"),
-            InlineKeyboardButton("Manage dates", callback_data="date_menu"),
+            InlineKeyboardButton("Manage schedule", callback_data="schedule_menu"),
         ],
         [InlineKeyboardButton("Close dialog", callback_data="delete")],
     ]
@@ -122,3 +122,12 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
             ],
         ]
     )
+
+
+SCHEDULE_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton("back", callback_data="profile"),
+        ],
+    ]
+)

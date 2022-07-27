@@ -83,7 +83,7 @@ class Pools(metaclass=Singleton):
         pass
 
     def __delitem__(self, pool_id: int):
-        # TODO: make sure user is admin
+        # TODO: make check that this method is only called by an admin
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
                 cur.execute(

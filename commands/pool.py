@@ -28,9 +28,7 @@ from telegram.ext import ContextTypes
 from commands.utils import requires_account
 
 
-async def pool_menu_callbacks(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
+async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     await query.answer()
