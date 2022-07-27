@@ -110,7 +110,15 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
             if is_admin
             else [],
             [
-                InlineKeyboardButton("Back", callback_data="pools_menu"),
+                InlineKeyboardButton(
+                    f"🆘 Delete {pool['name']} 🆘",
+                    callback_data=f"pool_menu:{pool['id']}:delete",
+                ),
+            ]
+            if is_admin
+            else [],
+            [
+                InlineKeyboardButton("Back", callback_data="pool_menu"),
             ],
         ]
     )

@@ -116,11 +116,11 @@ class PoolMembers(metaclass=Singleton):
     def check_db(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
-                # cur.execute("drop table if exists accountsPools CASCADE;")
+                cur.execute("drop table if exists poolMembers CASCADE;")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS poolMembers (
-                    account INTEGER REFERENCES accounts(id),
-                    pool INTEGER REFERENCES pools(id),
+                    account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+                    pool INTEGER REFERENCES pools(id) ON DELETE CASCADE,
                     admin BOOLEAN DEFAULT FALSE,
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     CONSTRAINT unique_account_pool UNIQUE (account, pool),

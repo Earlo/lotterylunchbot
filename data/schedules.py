@@ -36,8 +36,8 @@ class Schedules(metaclass=Singleton):
                 cur.execute("drop table if exists schedules;")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS schedules (
-                    account INTEGER REFERENCES accounts(id),
-                    pool INTEGER REFERENCES pools(id),
+                    account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+                    pool INTEGER REFERENCES pools(id) ON DELETE CASCADE,
                     weekday VARCHAR(8),
                     start_time TIME NOT NULL,
                     end_time TIME NOT NULL,

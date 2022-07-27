@@ -82,8 +82,16 @@ class Pools(metaclass=Singleton):
     def __len__(self):
         pass
 
-    def __delitem__(self, key):
-        pass
+    def __delitem__(self, pool_id: int):
+        # TODO: make sure user is admin
+        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
+            with con.cursor() as cur:
+                cur.execute(
+                    """DELETE FROM pools WHERE id = %s
+                    RETURNING *;""",
+                    (pool_id,),
+                )
+                return cur.fetchone()
 
     def __repr__(self) -> str:
         return str(list(self.__iter__()))

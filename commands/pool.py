@@ -60,6 +60,9 @@ async def pool_menu_callbacks(
             field = options[3]
             value = options[4]
             POOLS.update(pool_id, field, value)
+        elif action == "delete":
+            del POOLS[pool_id]
+            return await pools_menu(query, update)
     return await pool_menu(query, update, pool_id)
 
 
