@@ -74,6 +74,12 @@ Name: {}
 Description: {}
 Public: {}"""
 
+EDIT_POOL_DONE = """Edited pool\. 
+
+Name: {}
+Description: {}
+Public: {}"""
+
 
 JOIN_POOL_FAIL = """Pool named _{}_ doesn't exist\."""
 

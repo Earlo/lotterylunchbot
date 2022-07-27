@@ -87,35 +87,6 @@ async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 @requires_account
-async def leave_pool(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    return -1
-    # NOT IMPLEMENTED
-
-    pool_name = update.message.text.split(" ")[1]
-    pool = POOLS.get_by_name(pool_name)
-    if pool == None:
-        await update.message.reply_markdown_v2(
-            text=LEAVE_POOL_FAIL.format(escape_markdown(pool_name, version=2)),
-            reply_markup=OK_KEYBOARD,
-        )
-    else:
-        response = POOL_MEMBERS.remove(context._user_id, pool["id"])
-        if response == None:
-            await update.message.reply_markdown_v2(
-                text=LEAVE_POOL_NOT_MEMBER.format(
-                    escape_markdown(pool_name, version=2)
-                ),
-                reply_markup=OK_KEYBOARD,
-            )
-        else:
-            await update.message.reply_markdown_v2(
-                text=LEAVE_POOL_SUCCESS.format(escape_markdown(pool_name, version=2)),
-                reply_markup=OK_KEYBOARD,
-            )
-    return -1
-
-
-@requires_account
 async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     account = ACCOUNTS[context._user_id]
     await update.message.reply_markdown_v2(
@@ -148,10 +119,7 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             return await check(query.message, context)
     elif user_data["CHOICE"] == "submit_pool":
         if DATA == "True":
-            if user_data["POOL"]["id"]:
-                pool = POOLS[user_data["POOL"]["id"]] = user_data["POOL"]
-            else:
-                pool = POOLS.append(user_data["POOL"])
+            pool = POOLS.append(user_data["POOL"])
             POOL_MEMBERS.append(context._user_id, pool["id"], True)
             await update.callback_query.edit_message_text(
                 text=CREATE_POOL5.format(
@@ -162,7 +130,20 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
                 reply_markup=OK_KEYBOARD,
             )
-        return -1
+    elif user_data["CHOICE"] == "submit_pool_edit":
+        if user_data["POOL"]["id"]:
+            # Yrjistä :D
+            pool = POOLS[user_data["POOL"]["id"]] = user_data["POOL"]
+            await update.callback_query.edit_message_text(
+                text=EDIT_POOL_DONE.format(
+                    escape_markdown(pool["name"], version=2),
+                    escape_markdown(pool["description"], version=2),
+                    pool["public"],
+                ),
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
+                reply_markup=OK_KEYBOARD,
+            )
+    return -1
 
 
 async def add_name(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -216,7 +197,7 @@ async def check(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 
 async def check_feature(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
-    context.user_data["CHOICE"] = "submit_pool"
+    context.user_data["CHOICE"] = "submit_pool_edit"
     await message.reply_markdown_v2(
         text=f"change {context.user_data['POOL']['name']} {context.user_data['CURRENT_FEATURE']} to {context.user_data['POOL'][context.user_data['CURRENT_FEATURE']]}?",
         reply_markup=SUBMIT_CANCEL_KEYBOARD,

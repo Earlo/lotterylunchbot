@@ -77,7 +77,6 @@ def main():
                 MessageHandler(filters.TEXT & ~filters.COMMAND, save_text_input)
             ],
             "CONFIRM": [CallbackQueryHandler(choose)],
-            "DONE": [],
         },
         fallbacks=[CommandHandler("start", home)],
         per_message=False,
