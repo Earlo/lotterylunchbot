@@ -88,8 +88,9 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     if selected == "delete":
         return await query.delete_message()
-    # elif selected == "profile":
-    #    return await profile_menu(update, context)
+    elif selected == "profile":
+        account = ACCOUNTS[query.from_user.id]
+        return await send_profile_menu(query.edit_message_text, account)
     await query.edit_message_text(
         text=f"""View not implemented yet\.
         Selected option: {query.data}""",
@@ -99,8 +100,12 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     account = ACCOUNTS[update.message.from_user.id]
+    await send_profile_menu(update.message.reply_text, account)
+
+
+async def send_profile_menu(reply, account: dict):
     pools_in = POOLS.pools_in(account["id"])
-    await update.message.reply_markdown_v2(
+    await reply(
         text=OPTIONS.format(
             escape_markdown(account["first_name"], version=2),
             "\n".join(
@@ -116,4 +121,5 @@ async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "WIP",
         ),
         reply_markup=OPTIONS_KEYBOARD,
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
     )

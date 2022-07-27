@@ -33,7 +33,7 @@ OPTIONS_KEYBOARD = InlineKeyboardMarkup(
             InlineKeyboardButton("Manage pools", callback_data="pool_menu"),
             InlineKeyboardButton("Manage dates", callback_data="date_menu"),
         ],
-        [InlineKeyboardButton("Back", callback_data="0")],
+        [InlineKeyboardButton("Close dialog", callback_data="delete")],
     ]
 )
 
