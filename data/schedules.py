@@ -30,6 +30,16 @@ class Schedules(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
+    def add_schedule(
+        self, user_id: int, pool_id: int, weekday: str, start_time: str, end_time: str
+    ):
+        with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO schedules (account, pool, weekday, start_time, end_time) VALUES (%s, %s, %s, %s, %s)",
+                    (user_id, pool_id, weekday, start_time, end_time),
+                )
+
     def get_schedule(self, user_id: int) -> dict:
         with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
@@ -66,4 +76,18 @@ class Schedules(metaclass=Singleton):
 
 
 SCHEDULES = Schedules()
-DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+DAYS = [
+    "mon",
+    "tue",
+    "wed",
+    "thu",
+    "fri",
+    "sat",
+    "sun",
+]
+TIMES = [
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+]

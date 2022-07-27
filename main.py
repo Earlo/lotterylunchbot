@@ -88,13 +88,7 @@ def main():
         entry_points=[
             CallbackQueryHandler(schedule_menu_callbacks, pattern="schedule_menu"),
         ],
-        states={
-            "SELECTING": [CallbackQueryHandler(save_button_input)],
-            "TYPING": [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, save_text_input)
-            ],
-            "CONFIRM": [CallbackQueryHandler(choose)],
-        },
+        states={},
         fallbacks=[CommandHandler("start", home)],
         per_message=False,
         per_user=True,

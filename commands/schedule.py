@@ -9,7 +9,7 @@ from messages import *
 
 from keyboards import (
     SCHEDULE_KEYBOARD,
-    SUBMIT_CANCEL_KEYBOARD,
+    TIME_KEYBOARD,
     OK_KEYBOARD,
     OPTIONS_KEYBOARD,
 )
@@ -34,7 +34,23 @@ async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_
     options = query.data.split(":")
     if len(options) == 1:
         return await schedule_menu(query, update)
-    return await schedule_menu(query, update)
+    elif options[1] == "edit":
+        await query.edit_message_text(
+            text=":D",
+            parse_mode=constants.ParseMode.MARKDOWN_V2,
+            reply_markup=TIME_KEYBOARD(
+                context.user_data.get("MENU_OFFSET", 0),
+            ),
+        )
+    elif options[1] == "move":
+        context.user_data["MENU_OFFSET"] = int(options[2])
+        await query.edit_message_text(
+            text=":D",
+            parse_mode=constants.ParseMode.MARKDOWN_V2,
+            reply_markup=TIME_KEYBOARD(context.user_data["MENU_OFFSET"]),
+        )
+
+    return -1
 
 
 async def schedule_menu(query: CallbackQuery, update: Update):
