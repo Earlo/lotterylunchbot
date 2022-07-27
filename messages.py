@@ -94,4 +94,4 @@ LEAVE_POOL_NOT_MEMBER = """You are not a member of _{}_\."""
 
 LEAVE_POOL_SUCCESS = """You have left pool _{}_\."""
 
-POOL_EDIT_NAME = """Please enter the new name of your pool\."""
+POOL_EDIT = """Please enter the new {} of your pool\."""

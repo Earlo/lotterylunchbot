@@ -88,6 +88,15 @@ class Pools(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
+    def update(self, pool_id: int, field: str, value):
+        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
+            with con.cursor() as cur:
+                cur.execute(
+                    f"""UPDATE pools SET {field} = {value} WHERE id = {pool_id}
+                    RETURNING *;""",
+                )
+                return cur.fetchone()
+
     def public_pools(self):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:

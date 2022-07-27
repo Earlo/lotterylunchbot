@@ -46,17 +46,20 @@ async def pool_menu_callbacks(
             POOL_MEMBERS.remove_from(query.from_user.id, pool_id)
         elif action == "edit":
             target = options[3]
-            if target == "name":
-                await query.edit_message_text(
-                    text=POOL_EDIT_NAME,
-                    parse_mode=constants.ParseMode.MARKDOWN_V2,
-                    reply_markup=OK_KEYBOARD,
-                )
-                context.user_data["FORM"] = "POOL"
-                context.user_data["POOL"] = dict(POOLS[pool_id])
-                context.user_data["CURRENT_FEATURE"] = "name"
-                context.user_data["NEXT_PHASE"] = check_feature
-                return "TYPING"
+            await query.edit_message_text(
+                text=POOL_EDIT.format(target),
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
+                reply_markup=OK_KEYBOARD,
+            )
+            context.user_data["FORM"] = "POOL"
+            context.user_data["POOL"] = dict(POOLS[pool_id])
+            context.user_data["CURRENT_FEATURE"] = target
+            context.user_data["NEXT_PHASE"] = check_feature
+            return "TYPING"
+        elif action == "toggle":
+            field = options[3]
+            value = options[4]
+            POOLS.update(pool_id, field, value)
     return await pool_menu(query, update, pool_id)
 
 

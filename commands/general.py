@@ -88,7 +88,8 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
     if selected == "delete":
         return await query.delete_message()
-
+    # elif selected == "profile":
+    #    return await profile_menu(update, context)
     await query.edit_message_text(
         text=f"""View not implemented yet\.
         Selected option: {query.data}""",

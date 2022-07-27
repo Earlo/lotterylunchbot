@@ -104,13 +104,13 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
                 ),
                 InlineKeyboardButton(
                     f"Make {'private' if pool['public'] else 'public'}",
-                    callback_data=f"pool_menu:{pool['id']}:edit:public:{not pool['public']}",
+                    callback_data=f"pool_menu:{pool['id']}:toggle:public:{not pool['public']}",
                 ),
             ]
             if is_admin
             else [],
             [
-                InlineKeyboardButton("Back", callback_data="ools_menu"),
+                InlineKeyboardButton("Back", callback_data="pools_menu"),
             ],
         ]
     )
