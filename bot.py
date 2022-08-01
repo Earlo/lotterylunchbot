@@ -52,7 +52,6 @@ def main():
     Main function.
     """
     application = Application.builder().token(os.getenv("TOKEN")).build()
-
     # Get the dispatcher to register handlers
     conv_handler = ConversationHandler(
         entry_points=[
@@ -116,9 +115,6 @@ def main():
         interval=timedelta(days=1),
         first=time_until(os.getenv("LOTTERY_AT")),
     )
-    # Start the Bot
-    application.bot.set_webhook(os.getenv("WEBHOOK_URL") + os.getenv("TOKEN"))
-
     application.run_polling()
 
 
