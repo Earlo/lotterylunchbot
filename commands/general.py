@@ -113,7 +113,9 @@ async def send_profile_menu(reply, account: dict):
                     POOL_LIST.format(
                         "🌐" if p["public"] else "🔐",
                         escape_markdown(p["name"], version=2),
-                        f"{p['count']} members\." if p["count"] > 1 else "Just you 😔",
+                        f"{p['member_count']} members"
+                        if p["member_count"] > 1
+                        else "Just you 😔",
                     )
                     for p in pools_in
                 ]

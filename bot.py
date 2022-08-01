@@ -105,6 +105,7 @@ def main():
     application.add_error_handler(error)
 
     # Job queue for calling the invitations
+    """
     application.job_queue.run_repeating(
         callback=remind,
         interval=timedelta(days=1),
@@ -115,6 +116,7 @@ def main():
         interval=timedelta(days=1),
         first=time_until(os.getenv("LOTTERY_AT")),
     )
+    """
     application.run_polling()
 
 

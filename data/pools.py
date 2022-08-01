@@ -114,13 +114,16 @@ class Pools(metaclass=Singleton):
     def pools_in(self, account_id: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+
                 cur.execute(
-                    """SELECT 
-                        pools.public, pools.name, count(*) 
-                        FROM 
-                        pools LEFT JOIN poolMembers ON pools.id = poolMembers.pool 
-                        WHERE
-                        poolMembers.account = %s GROUP BY pools.id;""",
+                    """SELECT public, name, member_count
+                    FROM (
+                        SELECT pool, count(account) AS member_count
+                        FROM poolMembers
+                        GROUP BY pool
+                        ) AS members
+                    JOIN poolMembers ON members.pool = poolMembers.pool AND poolMembers.account = %s
+                    JOIN pools on poolMembers.pool = pools.id;""",
                     (account_id,),
                 )
                 return cur.fetchall()
