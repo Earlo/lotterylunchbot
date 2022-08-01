@@ -1,7 +1,7 @@
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
 from data.poolMembers import POOL_MEMBERS
-from data.schedules import SCHEDULES, DAYS
+from data.schedules import SCHEDULES, DAYS, TIMES
 
 from telegram.helpers import escape_markdown
 
@@ -57,18 +57,25 @@ async def schedule_menu(query: CallbackQuery, update: Update):
     """Displays the schedule menu."""
     user_id = query.from_user.id
     schedules = SCHEDULES.get_schedule(user_id)
+    print(schedules)
     await query.edit_message_text(
         text=SCHEDULE_MENU.format(
             "Name",
             "\n".join(
                 [
                     SCHEDULE_MENU_DATE_LINE.format(
-                        schedules[d]["weekday"],
-                        f'{schedules[d]["start_time"]}-{schedules[d]["end_time"]}'
-                        if schedules[d]["available"]
-                        else "X",
+                        DAYS[day_index],
+                        f"-".join(
+                            filter(
+                                lambda x: x != "",
+                                [
+                                    TIMES[time_index] if slot else ""
+                                    for time_index, slot in enumerate(column)
+                                ],
+                            )
+                        ),
                     )
-                    for d in DAYS
+                    for day_index, column in enumerate(schedules["calendar"])
                 ]
             ),
         ),

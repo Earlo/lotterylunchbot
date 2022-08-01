@@ -9,17 +9,16 @@ from datetime import timedelta, datetime
 
 async def check_accounts(context: ContextTypes):
     to_delete = set()
-    for u in ACCOUNTS:
+    for account_id in ACCOUNTS:
         try:
-            await context.bot.send_chat_action(u, "typing")
+            await context.bot.send_chat_action(account_id, "typing")
         except Exception as e:
-            print("User {} not found".format(u), e)
-            to_delete.add(u)
+            print("User {} not found".format(account_id), e)
+            to_delete.add(account_id)
         else:
-            ACCOUNTS[u] = await context.bot.getChat(u)
-    for u in to_delete:
-        print("Removing", ACCOUNTS[u]["username"])
-        del ACCOUNTS[u]
+            ACCOUNTS.create_account(account_id, await context.bot.getChat(account_id))
+    for account_id in to_delete:
+        del ACCOUNTS[account_id]
     ACCOUNTS.save()
 
 

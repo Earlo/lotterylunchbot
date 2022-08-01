@@ -6,12 +6,14 @@ from datetime import datetime
 from random import shuffle
 from singleton import Singleton
 
+from data.schedules import SCHEDULES
+
 
 class Accounts(metaclass=Singleton):
     def __init__(self):
         pass
 
-    def __setitem__(self, account_id: int, data):
+    def create_account(self, account_id: int, data):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor() as cur:
                 query = f"""INSERT INTO accounts (
@@ -22,7 +24,8 @@ class Accounts(metaclass=Singleton):
                     joined
                     ) VALUES (%s, %s, %s, %s, %s) 
                     ON CONFLICT (id) DO UPDATE SET username = %s, first_name = %s, last_name = %s
-                    """
+                    RETURNING id"""
+
                 cur.execute(
                     query,
                     (
@@ -36,6 +39,8 @@ class Accounts(metaclass=Singleton):
                         data["last_name"],
                     ),
                 )
+
+                SCHEDULES.create_schedule_query(cur, account_id)
 
     def __getitem__(self, account_id: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
