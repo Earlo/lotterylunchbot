@@ -46,6 +46,11 @@ async def error(bot, update):
     logger.warning('Update "%s" caused error "%s"', bot, update.error)
 
 
+async def add_webhook(bot):
+    await bot.set_webhook(os.getenv("WEBHOOK_URL") + os.getenv("TOKEN"))
+    return True
+
+
 def main():
     """
     Main function.
@@ -116,6 +121,7 @@ def main():
         first=time_until(os.getenv("LOTTERY_AT")),
     )
     # Start the Bot
+    add_webhook(application.bot)
     application.run_polling()
 
 
