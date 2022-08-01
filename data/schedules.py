@@ -30,7 +30,24 @@ class Schedules(metaclass=Singleton):
         pass
 
     def __repr__(self) -> str:
+        kek = []
         return str(list(self.__iter__()))
+
+    def update_schedule(
+        self, account_id: int, calendar: list, pool_id: int | None = None
+    ):
+        with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
+            with conn.cursor() as cur:
+                date_table = json.dumps(calendar).replace("[", "{").replace("]", "}")
+                print("inserting", date_table)
+                cur.execute(
+                    """
+                    UPDATE schedules
+                    SET calendar = %s
+                    WHERE account = %s
+                """,
+                    (date_table, account_id),
+                )
 
     def create_schedule(self, account_id: int, pool_id: int | None = None):
         with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
@@ -94,4 +111,12 @@ TIMES = [
     "12:00",
     "13:00",
     "14:00",
+]
+
+END_TIMES = [
+    "11:00",
+    "12:00",
+    "13:00",
+    "14:00",
+    "15:00",
 ]

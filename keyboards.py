@@ -1,3 +1,4 @@
+from array import array
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from data.pools import POOLS
 from data.schedules import DAYS, TIMES
@@ -137,14 +138,17 @@ SCHEDULE_KEYBOARD = InlineKeyboardMarkup(
 )
 
 
-def TIME_KEYBOARD(offset: int):
+def TIME_KEYBOARD(offset: int, calendar: array):
     width = 3
     day_grid = [
         [
-            InlineKeyboardButton(f"{d} {t}", callback_data=f"schedule_menu:{d} {t}")
-            for d in DAYS[offset : width + offset]
+            InlineKeyboardButton(
+                f"{'✅'if calendar[di +  offset][ti] else ''} {d} {t}",
+                callback_data=f"schedule_menu:toggle:{di +  offset}-{ti}",
+            )
+            for di, d in enumerate(DAYS[offset : width + offset])
         ]
-        for t in TIMES
+        for ti, t in enumerate(TIMES)
     ]
     arrows = []
     if offset > 0:
@@ -158,7 +162,9 @@ def TIME_KEYBOARD(offset: int):
     day_grid.append(arrows)
     day_grid.append(
         [
-            InlineKeyboardButton("back", callback_data="profile"),
+            InlineKeyboardButton(
+                "back and save changes", callback_data="schedule_menu:save"
+            ),
         ],
     )
 

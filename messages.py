@@ -104,3 +104,5 @@ SCHEDULE_MENU = """Schedule for *{}*,
 """
 
 SCHEDULE_MENU_DATE_LINE = """{}: {}"""
+
+SCHEDULE_EDIT_INSTRUCTIONS = """Click on the time slots that work for your lunch schedule\."""
