@@ -162,9 +162,7 @@ def TIME_KEYBOARD(offset: int, calendar: array):
     day_grid.append(arrows)
     day_grid.append(
         [
-            InlineKeyboardButton(
-                "back and save changes", callback_data="schedule_menu:save"
-            ),
+            InlineKeyboardButton("Save changes", callback_data="schedule_menu:save"),
         ],
     )
 

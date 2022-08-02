@@ -116,7 +116,11 @@ def get_times_string(column):
             streak = False
     if streak:
         string += "-" + END_TIMES[len(column)]
+    if string == "":
+        string = "No times selected"
+    else:
+        string = string.replace("  ", ", ")
+        string = string.replace(" ", "")
+        string = string.replace(",", ", ")
 
-    string = string.replace("  ", ", ")
-    string = string.replace(" ", "")
-    return string.replace(",", ", ")
+    return string
