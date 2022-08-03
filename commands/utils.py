@@ -1,9 +1,9 @@
-from telegram.ext import ContextTypes
 from telegram import Message, Update
+from telegram.ext import ContextTypes
 
+from commands.account import register_account
 from data.accounts import ACCOUNTS
 from data.schedules import SCHEDULES
-from commands.account import register_account
 
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:

@@ -1,8 +1,8 @@
-from data.accounts import ACCOUNTS
-from data.pools import POOLS
-from data.schedules import SCHEDULES
-from data.poolMembers import POOL_MEMBERS
+import logging
+import os
+from datetime import timedelta
 
+from dotenv import load_dotenv
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -13,24 +13,21 @@ from telegram.ext import (
 )
 
 from commands.general import (
+    debug_raffle_pairs,
     home,
-    count,
-    skip,
+    inline_menu,
     raffle_pairs,
     remind,
-    debug_raffle_pairs,
-    inline_menu,
+    skip,
 )
-from commands.pool import create_pool, choose, join_pool, pool_menu_callbacks
-from commands.utils import save_text_input, save_button_input
+from commands.pool import choose, create_pool, join_pool, pool_menu_callbacks
 from commands.schedule import schedule_menu_callbacks
-
+from commands.utils import save_button_input, save_text_input
+from data.accounts import ACCOUNTS
+from data.poolMembers import POOL_MEMBERS
+from data.pools import POOLS
+from data.schedules import SCHEDULES
 from utils import time_until
-from datetime import timedelta
-import logging
-import os
-from dotenv import load_dotenv
-import asyncio
 
 load_dotenv()  # take environment variables from .env.
 
@@ -56,7 +53,6 @@ def main():
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", home),
-            CommandHandler("count", count),
             CommandHandler("skip", skip),
             CommandHandler("debugraffle", debug_raffle_pairs),
         ],

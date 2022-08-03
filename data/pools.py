@@ -1,10 +1,10 @@
 import os
-
 from datetime import datetime
-from singleton import Singleton
 
 import psycopg2
 import psycopg2.extras
+
+from singleton import Singleton
 
 
 class Pools(metaclass=Singleton):

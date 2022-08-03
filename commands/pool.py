@@ -1,31 +1,26 @@
-from data.accounts import ACCOUNTS
-from data.pools import POOLS
-from data.poolMembers import POOL_MEMBERS
-
-from telegram.helpers import escape_markdown
-
-from messages import *
-
-from keyboards import (
-    YES_NO_KEYBOARD,
-    SUBMIT_CANCEL_KEYBOARD,
-    OK_KEYBOARD,
-    OPTIONS_KEYBOARD,
-    POOL_KEYBOARD,
-    POOLS_KEYBOARD,
-)
-
 from telegram import (
-    Message,
-    Update,
-    constants,
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
+    Message,
+    Update,
+    constants,
 )
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from commands.utils import requires_account
+from data.accounts import ACCOUNTS
+from data.poolMembers import POOL_MEMBERS
+from data.pools import POOLS
+from keyboards import (
+    OK_KEYBOARD,
+    POOL_KEYBOARD,
+    POOLS_KEYBOARD,
+    SUBMIT_CANCEL_KEYBOARD,
+    YES_NO_KEYBOARD,
+)
+from messages import *
 
 
 async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):

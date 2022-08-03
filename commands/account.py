@@ -1,11 +1,10 @@
-from data.accounts import ACCOUNTS
-
-from messages import *
-
-from keyboards import OPTIONS_KEYBOARD
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.helpers import escape_markdown
+
+from data.accounts import ACCOUNTS
+from keyboards import OPTIONS_KEYBOARD
+from messages import GREETING_NEW
 
 
 async def register_account(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

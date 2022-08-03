@@ -1,12 +1,12 @@
 import os
+from datetime import datetime
+from random import shuffle
+
 import psycopg2
 import psycopg2.extras
 
-from datetime import datetime
-from random import shuffle
-from singleton import Singleton
-
 from data.schedules import SCHEDULES
+from singleton import Singleton
 
 
 class Accounts(metaclass=Singleton):

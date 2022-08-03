@@ -1,20 +1,15 @@
-from multiprocessing import context
 import os
-from telegram import Update, CallbackQuery, constants
-from telegram.ext import ContextTypes, CallbackContext
+
+from telegram import Update, constants
+from telegram.ext import CallbackContext, ContextTypes
 from telegram.helpers import escape_markdown
 
+from commands.utils import get_user_schedule, requires_account
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
-from data.poolMembers import POOL_MEMBERS
-
+from keyboards import OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
-from keyboards import (
-    OPTIONS_KEYBOARD,
-    OK_KEYBOARD,
-)
-from commands.utils import requires_account, get_user_schedule
 
 
 @requires_account
@@ -25,13 +20,6 @@ async def home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 @requires_account
 async def skip(update: Update, context: ContextTypes):
     ACCOUNTS.disqualified_accounts.add(update.message.from_user.id)
-
-
-async def count(update: Update, context: ContextTypes):
-    await check_accounts(context)
-    await update.message.reply_markdown_v2(
-        text=TALLY.format(len(ACCOUNTS)),
-    )
 
 
 async def remind(context: CallbackContext):

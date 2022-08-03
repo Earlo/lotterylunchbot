@@ -1,10 +1,11 @@
-import os
-from singleton import Singleton
 import json
+import os
 
 import psycopg2
-import psycopg2.extras
 import psycopg2.extensions
+import psycopg2.extras
+
+from singleton import Singleton
 
 
 class Schedules(metaclass=Singleton):

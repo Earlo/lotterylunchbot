@@ -1,9 +1,8 @@
-from array import array
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 from data.pools import POOLS
 from data.schedules import DAYS, TIMES
 from utils import chunks
-
 
 CLEANUP = InlineKeyboardMarkup(
     [
@@ -145,7 +144,7 @@ SCHEDULE_KEYBOARD = InlineKeyboardMarkup(
 )
 
 
-def TIME_KEYBOARD(offset: int, calendar: array):
+def TIME_KEYBOARD(offset: int, calendar: list):
     width = 3
     day_grid = [
         [

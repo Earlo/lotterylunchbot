@@ -1,30 +1,10 @@
-from data.accounts import ACCOUNTS
-from data.pools import POOLS
-from data.poolMembers import POOL_MEMBERS
-from data.schedules import SCHEDULES, DAYS, TIMES, END_TIMES
-
-from telegram.helpers import escape_markdown
-
-from messages import *
-
-from keyboards import (
-    SCHEDULE_KEYBOARD,
-    TIME_KEYBOARD,
-    OK_KEYBOARD,
-    OPTIONS_KEYBOARD,
-)
-
-from telegram import (
-    Message,
-    Update,
-    constants,
-    CallbackQuery,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-)
+from telegram import CallbackQuery, Update, constants
 from telegram.ext import ContextTypes
 
-from commands.utils import requires_account, get_user_schedule
+from commands.utils import get_user_schedule
+from data.schedules import DAYS, END_TIMES, SCHEDULES, TIMES
+from keyboards import SCHEDULE_KEYBOARD, TIME_KEYBOARD
+from messages import *
 
 
 async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):

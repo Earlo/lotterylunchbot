@@ -1,11 +1,8 @@
-from asyncio import constants
-from data.accounts import ACCOUNTS
-from data.schedules import SCHEDULES
-
-from messages import *
+from datetime import datetime, timedelta
 
 from telegram.ext import ContextTypes
-from datetime import timedelta, datetime
+
+from data.accounts import ACCOUNTS
 
 
 async def check_accounts(context: ContextTypes):
