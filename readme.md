@@ -8,7 +8,7 @@ Use @botfather in telegram to generate yourself a bot token.
 rename `env.example` to `.env` and place your token there.
 
 `pip install -r requirements.txt`  
-`python main.py`
+`python bot.py`
 
 ## Example
 
