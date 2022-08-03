@@ -69,6 +69,16 @@ SUBMIT_CANCEL_KEYBOARD = InlineKeyboardMarkup(
         ]
     ]
 )
+RETURN_TO_POOL_MENU_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton(
+                text="Return to pool menu",
+                callback_data="pool_menu",
+            ),
+        ],
+    ]
+)
 
 POOL_OPTIONS_KEYBOARD = InlineKeyboardMarkup(
     [
@@ -94,13 +104,13 @@ POOL_OPTIONS_KEYBOARD = InlineKeyboardMarkup(
 )
 
 
-def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
+def POOLS_KEYBOARD(extra: str = "") -> InlineKeyboardMarkup:
     pool_buttons = list(
         chunks(
             [
                 InlineKeyboardButton(
                     f"View {pool['name']}",
-                    callback_data=f"pool_menu:{pool['id']}:view",
+                    callback_data=f"pool_menu:{pool['id']}:view{extra}",
                 )
                 for pool in POOLS.public_pools()
             ],
@@ -115,7 +125,9 @@ def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(pool_buttons)
 
 
-def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboardMarkup:
+def POOL_KEYBOARD(
+    pool: dict, is_member: bool, is_admin: bool, return_page: str | None = None
+) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         [
             [
@@ -149,7 +161,12 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
             if is_admin
             else [],
             [
-                InlineKeyboardButton("Back", callback_data="pool_menu"),
+                InlineKeyboardButton(
+                    "Back",
+                    callback_data=return_page
+                    if return_page is not None
+                    else "pool_menu",
+                ),
             ],
         ]
     )

@@ -81,6 +81,8 @@ Description: {}
 Public: {}"""
 
 
+JOIN_POOL_PROMT = """Enter the pool's name you want to join\."""
+
 JOIN_POOL_FAIL = """Pool named _{} _doesn't exist\."""
 
 JOIN_POOL_ALREADY_MEMBER = """You are already a member of _{}\._"""

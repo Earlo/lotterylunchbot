@@ -18,6 +18,7 @@ from keyboards import (
     POOL_KEYBOARD,
     POOL_OPTIONS_KEYBOARD,
     POOLS_KEYBOARD,
+    RETURN_TO_POOL_MENU_KEYBOARD,
     SUBMIT_CANCEL_KEYBOARD,
     YES_NO_KEYBOARD,
 )
@@ -36,11 +37,26 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
         action = options[1]
         if action == "browse":
             return await browse_public_pools(query, update)
+        elif action == "join":
+            await query.edit_message_text(
+                text=JOIN_POOL_PROMT,
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
+                reply_markup=OK_KEYBOARD,
+            )
+            context.user_data["FORM"] = "JOIN_POOL"
+            context.user_data["JOIN_POOL"] = {}
+            context.user_data["CURRENT_FEATURE"] = "name"
+            context.user_data["NEXT_PHASE"] = join_private_pool
+            return "TYPING"
     elif len(options) > 2:
         # actions for pool -> pool_id
         pool_id = int(options[1])
         action = options[2]
         if action == "view":
+            if options[3] == "return":
+                return await pool_page(
+                    query, update, pool_id, f"{':'.join(options[4:])}"
+                )
             return await pool_page(query, update, pool_id)
         elif action == "join":
             POOL_MEMBERS.append(query.from_user.id, pool_id)
@@ -92,6 +108,21 @@ async def join_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
                 reply_markup=OK_KEYBOARD,
             )
     return -1
+
+
+async def join_private_pool(message: Message, context: ContextTypes.DEFAULT_TYPE):
+    """Add information about the pool."""
+    pool_name = context.user_data["JOIN_POOL"]["name"]
+    pool = POOLS.get_by_name(pool_name)
+    if pool is None:
+        await message.reply_markdown_v2(
+            text=JOIN_POOL_FAIL.format(escape_markdown(pool_name, version=2)),
+            reply_markup=RETURN_TO_POOL_MENU_KEYBOARD,
+        )
+        return -1
+    else:
+        await pool_page_view(message.reply_text, message.from_user.id, pool)
+        return -1
 
 
 @requires_account
@@ -216,7 +247,7 @@ async def check_feature(message: Message, context: ContextTypes.DEFAULT_TYPE) ->
 async def browse_public_pools(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
         text=POOL_BROWSE_PUBLIC,
-        reply_markup=POOLS_KEYBOARD(),
+        reply_markup=POOLS_KEYBOARD(extra=":return:pool_menu:browse"),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
 
@@ -229,11 +260,18 @@ async def pools_menu(query: CallbackQuery, update: Update) -> None:
     )
 
 
-async def pool_page(query: CallbackQuery, update: Update, pool_id: int) -> None:
-    user_id = query.from_user.id
-    pool = POOLS[pool_id]
+async def pool_page(
+    query: CallbackQuery, update: Update, pool_id: int, return_page: str | None = None
+) -> None:
+    return await pool_page_view(
+        query.edit_message_text, query.from_user.id, POOLS[pool_id], return_page
+    )
+
+
+async def pool_page_view(reply, user_id, pool, return_page: str | None = None):
     is_member, is_admin, count = POOL_MEMBERS.get_meta(user_id, pool["id"])
-    await query.edit_message_text(
+
+    await reply(
         text=POOL_DESCRIPTION.format(
             escape_markdown(pool["name"], version=2),
             escape_markdown(pool["description"], version=2),
@@ -245,6 +283,6 @@ async def pool_page(query: CallbackQuery, update: Update, pool_id: int) -> None:
             if is_member
             else "You're not a member",
         ),
-        reply_markup=POOL_KEYBOARD(pool, is_member, is_admin),
+        reply_markup=POOL_KEYBOARD(pool, is_member, is_admin, return_page),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
