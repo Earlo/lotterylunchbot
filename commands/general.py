@@ -95,7 +95,7 @@ async def send_profile_menu(reply, context: ContextTypes.DEFAULT_TYPE):
     pools_in = POOLS.pools_in(context._user_id)
 
     filtered_days = list(
-        filter(lambda column: True in column, context.user_data["CALENDER"])
+        filter(lambda column: True in column, context.user_data.get("CALENDER", []))
     )
     account_schedule = [
         SCHEDULE_MENU_DATE_LINE.format(

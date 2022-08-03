@@ -41,11 +41,9 @@ class Schedules(metaclass=Singleton):
             with conn.cursor() as cur:
                 date_table = json.dumps(calendar).replace("[", "{").replace("]", "}")
                 cur.execute(
-                    """
-                    UPDATE schedules
+                    """UPDATE schedules
                     SET calendar = %s
-                    WHERE account = %s
-                """,
+                    WHERE account = %s""",
                     (date_table, account_id),
                 )
 
@@ -87,8 +85,7 @@ class Schedules(metaclass=Singleton):
                 )
                 cur.execute(
                     f"""CREATE TABLE IF NOT EXISTS schedules (
-                    id SERIAL PRIMARY KEY,
-                    account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+                    account INTEGER PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
                     pool INTEGER REFERENCES pools(id) ON DELETE CASCADE,
                     calendar BOOLEAN[{len(DAYS)}][{len(TIMES)}] NOT NULL DEFAULT '{date_table}'::BOOLEAN[{len(DAYS)}][{len(TIMES)}],
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
