@@ -2,6 +2,7 @@ from telegram.ext import ContextTypes
 from telegram import Message, Update
 
 from data.accounts import ACCOUNTS
+from data.schedules import SCHEDULES
 from commands.account import register_account
 
 
@@ -42,3 +43,9 @@ def requires_account(func):
             return await register_account(update, context)
 
     return wrapper
+
+
+def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
+    """Returns the schedule of the user."""
+    schedules = SCHEDULES.get_schedule(user_id)
+    context.user_data["CALENDER"] = schedules["calendar"]

@@ -214,7 +214,7 @@ async def pools_menu(query: CallbackQuery, update: Update) -> None:
         text=POOL_OPTIONS.format(
             escape_markdown(query.from_user.first_name, version=2)
         ),
-        reply_markup=POOLS_KEYBOARD(),
+        reply_markup=POOLS_KEYBOARD(query.from_user.id),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
 

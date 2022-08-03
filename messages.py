@@ -38,7 +38,7 @@ To create a new pool use
 """
 
 POOL_DESCRIPTION = """*{}*
-_{}_
+_{} _
 
 Public: {}
 
@@ -81,18 +81,18 @@ Description: {}
 Public: {}"""
 
 
-JOIN_POOL_FAIL = """Pool named _{}_ doesn't exist\."""
+JOIN_POOL_FAIL = """Pool named _{} _doesn't exist\."""
 
-JOIN_POOL_ALREADY_MEMBER = """You are already a member of _{}_\."""
+JOIN_POOL_ALREADY_MEMBER = """You are already a member of _{}\._"""
 
-JOIN_POOL_SUCCESS = """You have joined pool _{}_\."""
+JOIN_POOL_SUCCESS = """You have joined pool _{}\._"""
 
 
-LEAVE_POOL_FAIL = """Pool named _{}_ doesn't exist\."""
+LEAVE_POOL_FAIL = """Pool named _{} _doesn't exist\."""
 
-LEAVE_POOL_NOT_MEMBER = """You are not a member of _{}_\."""
+LEAVE_POOL_NOT_MEMBER = """You are not a member of _{}\._"""
 
-LEAVE_POOL_SUCCESS = """You have left pool _{}_\."""
+LEAVE_POOL_SUCCESS = """You have left pool _{}\._"""
 
 POOL_EDIT = """Please enter the new {} of your pool\."""
 
@@ -105,4 +105,6 @@ SCHEDULE_MENU = """Schedule for *{}*,
 
 SCHEDULE_MENU_DATE_LINE = """{}: {}"""
 
-SCHEDULE_EDIT_INSTRUCTIONS = """Click on the time slots that work for your lunch schedule\."""
+SCHEDULE_EDIT_INSTRUCTIONS = (
+    """Click on the time slots that work for your lunch schedule\."""
+)

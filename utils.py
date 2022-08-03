@@ -40,7 +40,7 @@ def time_until(clock: str):
     return next_time - now
 
 
-def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
-    """Returns the schedule of the user."""
-    schedules = SCHEDULES.get_schedule(user_id)
-    context.user_data["CALENDER"] = schedules["calendar"]
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i : i + n]

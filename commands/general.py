@@ -11,11 +11,8 @@ from data.poolMembers import POOL_MEMBERS
 from messages import *
 from utils import check_accounts
 from keyboards import (
-    HOMEKEYBOARD,
     OPTIONS_KEYBOARD,
-    POOLS_KEYBOARD,
     OK_KEYBOARD,
-    POOL_KEYBOARD,
 )
 from commands.utils import requires_account, get_user_schedule
 

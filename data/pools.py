@@ -111,6 +111,17 @@ class Pools(metaclass=Singleton):
                 cur.execute("""SELECT * FROM pools WHERE public = TRUE;""")
                 return cur.fetchall()
 
+    def availeable_pools(self, account_id: int):
+        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
+            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """SELECT * FROM pools WHERE public = TRUE OR id IN (
+                        SELECT pool FROM poolMembers WHERE account = %s
+                    );""",
+                    (account_id,),
+                )
+                return cur.fetchall()
+
     def pools_in(self, account_id: int):
         with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
             with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:

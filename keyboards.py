@@ -2,6 +2,8 @@ from array import array
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from data.pools import POOLS
 from data.schedules import DAYS, TIMES
+from utils import chunks
+
 
 CLEANUP = InlineKeyboardMarkup(
     [
@@ -70,20 +72,25 @@ SUBMIT_CANCEL_KEYBOARD = InlineKeyboardMarkup(
 )
 
 
-def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        [
+def POOLS_KEYBOARD(account: int) -> InlineKeyboardMarkup:
+    pool_buttons = list(
+        chunks(
             [
                 InlineKeyboardButton(
-                    f"View {pool['name']}", callback_data=f"pool_menu:{pool['id']}"
+                    f"View {pool['name']}",
+                    callback_data=f"pool_menu:{pool['id']}",
                 )
-                for pool in POOLS.public_pools()
+                for pool in POOLS.availeable_pools(account)
             ],
-            [
-                InlineKeyboardButton("Back", callback_data="profile"),
-            ],
+            3,
+        )
+    )
+    pool_buttons.append(
+        [
+            InlineKeyboardButton("Back", callback_data="profile"),
         ]
     )
+    return InlineKeyboardMarkup(pool_buttons)
 
 
 def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboardMarkup:
