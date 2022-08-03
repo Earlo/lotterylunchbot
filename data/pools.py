@@ -12,8 +12,8 @@ class Pools(metaclass=Singleton):
         pass
 
     def __setitem__(self, pool_id: int, data):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 query = f"""INSERT INTO pools (
                     id,
                     name,
@@ -41,8 +41,8 @@ class Pools(metaclass=Singleton):
                 return cur.fetchone()
 
     def append(self, data):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 query = f"""INSERT INTO pools (
                     name,
                     description,
@@ -62,14 +62,14 @@ class Pools(metaclass=Singleton):
                 return cur.fetchone()
 
     def __getitem__(self, pool_id: int):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT * FROM pools WHERE id = %s;""", (pool_id,))
                 return cur.fetchone()
 
     def get_by_name(self, name: str):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT * FROM pools WHERE name ILIKE %s;""", (name,))
                 return cur.fetchone()
 
@@ -84,8 +84,8 @@ class Pools(metaclass=Singleton):
 
     def __delitem__(self, pool_id: int):
         # TODO: make check that this method is only called by an admin
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 cur.execute(
                     """DELETE FROM pools WHERE id = %s
                     RETURNING *;""",
@@ -97,8 +97,8 @@ class Pools(metaclass=Singleton):
         return str(list(self.__iter__()))
 
     def update(self, pool_id: int, field: str, value):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 cur.execute(
                     f"""UPDATE pools SET {field} = {value} WHERE id = {pool_id}
                     RETURNING *;""",
@@ -106,14 +106,14 @@ class Pools(metaclass=Singleton):
                 return cur.fetchone()
 
     def public_pools(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT * FROM pools WHERE public = TRUE;""")
                 return cur.fetchall()
 
     def availeable_pools(self, account_id: int):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute(
                     """SELECT * FROM pools WHERE public = TRUE OR id IN (
                         SELECT pool FROM poolMembers WHERE account = %s
@@ -123,9 +123,8 @@ class Pools(metaclass=Singleton):
                 return cur.fetchall()
 
     def pools_in(self, account_id: int):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute(
                     """SELECT public, name, member_count
                     FROM (
@@ -140,8 +139,9 @@ class Pools(metaclass=Singleton):
                 return cur.fetchall()
 
     def check_db(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
+        with self.con:
+            with self.con.cursor() as cur:
                 # cur.execute("drop table if exists pools CASCADE;")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS pools (
@@ -155,6 +155,12 @@ class Pools(metaclass=Singleton):
                     CONSTRAINT unique_pool_name UNIQUE (name)
                 );"""
                 )
+
+    def close_connection(self):
+        print("closing pools")
+        self.con.commit()
+        self.con.close()
+        print("pools closed")
 
 
 POOLS = Pools()

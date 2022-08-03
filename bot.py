@@ -124,3 +124,9 @@ if __name__ == "__main__":
     POOL_MEMBERS.check_db()
 
     main()
+
+    print("Shutting the bot down")
+    ACCOUNTS.close_connection()
+    POOLS.close_connection()
+    SCHEDULES.close_connection()
+    POOL_MEMBERS.close_connection()

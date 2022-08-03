@@ -14,8 +14,8 @@ class Accounts(metaclass=Singleton):
         pass
 
     def create_account(self, account_id: int, data):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 query = f"""INSERT INTO accounts (
                     id,
                     username,
@@ -43,14 +43,14 @@ class Accounts(metaclass=Singleton):
                 SCHEDULES.create_schedule_query(cur, account_id)
 
     def __getitem__(self, account_id: int):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT * FROM accounts WHERE id = %s""", (account_id,))
                 return cur.fetchone()
 
     def __iter__(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 cur.execute(
                     """SELECT id
                     FROM accounts
@@ -61,28 +61,28 @@ class Accounts(metaclass=Singleton):
                     yield account[0]
 
     def __contains__(self, item):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT * FROM accounts WHERE id = %s""", (item,))
                 return cur.fetchone() is not None
 
     def __len__(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""SELECT COUNT(*) FROM accounts""")
                 return cur.fetchone()[0]
 
     def __delitem__(self, key):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute("""DELETE FROM accounts WHERE id = %s""", (key,))
 
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
     def get_qualified(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 cur.execute("""SELECT id FROM accounts WHERE disqualified = FALSE""")
                 return [x[0] for x in cur.fetchall()]
 
@@ -101,8 +101,9 @@ class Accounts(metaclass=Singleton):
         pass
 
     def check_db(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
+        with self.con:
+            with self.con.cursor() as cur:
                 # cur.execute("drop table if exists accounts cascade")
                 cur.execute(
                     """CREATE TABLE IF NOT EXISTS accounts (
@@ -116,6 +117,12 @@ class Accounts(metaclass=Singleton):
                     CONSTRAINT unique_username UNIQUE (username)
                 );"""
                 )
+
+    def close_connection(self):
+        print("closing accounts")
+        self.con.commit()
+        self.con.close()
+        print("accounts closed")
 
 
 ACCOUNTS = Accounts()

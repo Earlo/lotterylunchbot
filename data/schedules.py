@@ -37,8 +37,8 @@ class Schedules(metaclass=Singleton):
     def update_schedule(
         self, account_id: int, calendar: list, pool_id: int | None = None
     ):
-        with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
-            with conn.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 date_table = json.dumps(calendar).replace("[", "{").replace("]", "}")
                 cur.execute(
                     """UPDATE schedules
@@ -48,8 +48,8 @@ class Schedules(metaclass=Singleton):
                 )
 
     def create_schedule(self, account_id: int, pool_id: int | None = None):
-        with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
-            with conn.cursor() as cur:
+        with self.con:
+            with self.con.cursor() as cur:
                 self.create_schedule_query(cur, account_id, pool_id)
 
     def create_schedule_query(
@@ -64,8 +64,8 @@ class Schedules(metaclass=Singleton):
         )
 
     def get_schedule(self, user_id: int) -> dict:
-        with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
                 cur.execute(
                     "SELECT calendar FROM schedules WHERE account = %s",
                     (user_id,),
@@ -73,8 +73,9 @@ class Schedules(metaclass=Singleton):
                 return cur.fetchone()
 
     def check_db(self):
-        with psycopg2.connect(os.environ.get("DATABASE_URL")) as con:
-            with con.cursor() as cur:
+        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
+        with self.con:
+            with self.con.cursor() as cur:
                 # cur.execute("drop table if exists schedules;")
                 date_table = (
                     json.dumps(
@@ -91,6 +92,12 @@ class Schedules(metaclass=Singleton):
                     created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
                 );"""
                 )
+
+    def close_connection(self):
+        print("closing schedules")
+        self.con.commit()
+        self.con.close()
+        print("schedules closed")
 
 
 SCHEDULES = Schedules()
