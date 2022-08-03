@@ -18,10 +18,10 @@ MISS = """Sorry, you were the odd one out today and we couldn't find you a lunch
 
 
 OPTIONS = """Hello *{}*,
-You are in lottery pools: 
+__You are in lottery pools:__
 {}
 
-You're availeable for lunch on:
+__You're availeable for lunch on:__
 {}
 """
 
@@ -108,3 +108,15 @@ SCHEDULE_MENU_DATE_LINE = """{}: {}"""
 SCHEDULE_EDIT_INSTRUCTIONS = (
     """Click on the time slots that work for your lunch schedule\."""
 )
+
+NO_SCHEDULE_SET = """You haven't set a schedule yet\.
+You need to have a schedule before you can participate in lunch lotteries\.
+
+Click 'Manage schedule' to set one\.
+"""
+
+NO_POOLS_JOINED = """You haven't joined any pools yet\.
+You need to be a member of a pool before you can participate in lunch lotteries\.
+
+Click 'Manage pools' to join or create one\.
+"""

@@ -1,5 +1,6 @@
 from telegram import CallbackQuery, Update, constants
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from commands.utils import get_user_schedule
 from data.schedules import DAYS, END_TIMES, SCHEDULES, TIMES
@@ -86,10 +87,10 @@ def get_times_string(column):
             string += " " + TIMES[index]
             streak = True
         elif not available and streak:
-            string += "-" + END_TIMES[index] + " "
+            string += "\-" + END_TIMES[index] + " "
             streak = False
     if streak:
-        string += "-" + END_TIMES[len(column)]
+        string += "\-" + END_TIMES[len(column)]
     if string == "":
         string = "No times selected"
     else:
@@ -97,4 +98,4 @@ def get_times_string(column):
         string = string.replace(" ", "")
         string = string.replace(",", ", ")
 
-    return string
+    return escape_markdown(string)

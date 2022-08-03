@@ -40,7 +40,6 @@ class Schedules(metaclass=Singleton):
         with psycopg2.connect(os.environ["DATABASE_URL"]) as conn:
             with conn.cursor() as cur:
                 date_table = json.dumps(calendar).replace("[", "{").replace("]", "}")
-                print("inserting", date_table)
                 cur.execute(
                     """
                     UPDATE schedules

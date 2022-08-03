@@ -4,9 +4,11 @@ from telegram import Update, constants
 from telegram.ext import CallbackContext, ContextTypes
 from telegram.helpers import escape_markdown
 
+from commands.schedule import get_times_string
 from commands.utils import get_user_schedule, requires_account
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
+from data.schedules import DAYS
 from keyboards import OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
@@ -76,8 +78,7 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     if selected == "delete":
         return await query.delete_message()
     elif selected == "profile":
-        account = ACCOUNTS[query.from_user.id]
-        return await send_profile_menu(query.edit_message_text, account)
+        return await send_profile_menu(query.edit_message_text, context)
     await query.edit_message_text(
         text=f"""View not implemented yet\.
         Selected option: {query.data}""",
@@ -86,29 +87,41 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 
 async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    account = ACCOUNTS[update.message.from_user.id]
-    await send_profile_menu(update.message.reply_text, account)
+    await send_profile_menu(update.message.reply_text, context)
 
 
-async def send_profile_menu(reply, account: dict):
-    pools_in = POOLS.pools_in(account["id"])
+async def send_profile_menu(reply, context: ContextTypes.DEFAULT_TYPE):
+    account = ACCOUNTS[context._user_id]
+    pools_in = POOLS.pools_in(context._user_id)
+
+    filtered_days = list(
+        filter(lambda column: True in column, context.user_data["CALENDER"])
+    )
+    account_schedule = [
+        SCHEDULE_MENU_DATE_LINE.format(
+            DAYS[day_index],
+            get_times_string(column),
+        )
+        for day_index, column in enumerate(filtered_days)
+    ]
+    account_pools = [
+        POOL_LIST.format(
+            "🌐" if p["public"] else "🔐",
+            escape_markdown(p["name"], version=2),
+            f"{p['member_count']} members" if p["member_count"] > 1 else "Just you 😔",
+        )
+        for p in pools_in
+    ]
+    if account_schedule == []:
+        account_schedule = [NO_SCHEDULE_SET]
+    if account_pools == []:
+        account_pools = [NO_POOLS_JOINED]
 
     await reply(
         text=OPTIONS.format(
             escape_markdown(account["first_name"], version=2),
-            "\n".join(
-                [
-                    POOL_LIST.format(
-                        "🌐" if p["public"] else "🔐",
-                        escape_markdown(p["name"], version=2),
-                        f"{p['member_count']} members"
-                        if p["member_count"] > 1
-                        else "Just you 😔",
-                    )
-                    for p in pools_in
-                ]
-            ),
-            "WIP",
+            "\n".join(account_pools),
+            "\n".join(account_schedule),
         ),
         reply_markup=OPTIONS_KEYBOARD,
         parse_mode=constants.ParseMode.MARKDOWN_V2,
