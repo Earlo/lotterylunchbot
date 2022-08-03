@@ -1,9 +1,10 @@
 from telegram import Message, Update
 from telegram.ext import ContextTypes
+from telegram.helpers import escape_markdown
 
 from commands.account import register_account
 from data.accounts import ACCOUNTS
-from data.schedules import SCHEDULES
+from data.schedules import END_TIMES, SCHEDULES, TIMES
 
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -49,3 +50,26 @@ def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
     """Returns the schedule of the user."""
     schedules = SCHEDULES.get_schedule(user_id)
     context.user_data["CALENDER"] = schedules["calendar"]
+
+
+def get_times_string(column):
+    """Returns a string of the times in the column."""
+    streak = False
+    string = ""
+    for index, available in enumerate(column):
+        if available and not streak:
+            string += " " + TIMES[index]
+            streak = True
+        elif not available and streak:
+            string += "\-" + END_TIMES[index] + " "
+            streak = False
+    if streak:
+        string += "\-" + END_TIMES[len(column)]
+    if string == "":
+        string = "No times selected"
+    else:
+        string = string.replace("  ", ", ")
+        string = string.replace(" ", "")
+        string = string.replace(",", ", ")
+
+    return escape_markdown(string)

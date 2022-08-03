@@ -4,8 +4,7 @@ from telegram import Update, constants
 from telegram.ext import CallbackContext, ContextTypes
 from telegram.helpers import escape_markdown
 
-from commands.schedule import get_times_string
-from commands.utils import get_user_schedule, requires_account
+from commands.utils import get_times_string, get_user_schedule, requires_account
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
 from data.schedules import DAYS

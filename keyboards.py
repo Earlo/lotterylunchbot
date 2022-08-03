@@ -132,18 +132,6 @@ def POOL_KEYBOARD(pool: dict, is_member: bool, is_admin: bool) -> InlineKeyboard
     )
 
 
-SCHEDULE_KEYBOARD = InlineKeyboardMarkup(
-    [
-        [
-            InlineKeyboardButton("Edit schedule", callback_data="schedule_menu:edit"),
-        ],
-        [
-            InlineKeyboardButton("back", callback_data="profile"),
-        ],
-    ]
-)
-
-
 def TIME_KEYBOARD(offset: int, calendar: list):
     width = 3
     day_grid = [
