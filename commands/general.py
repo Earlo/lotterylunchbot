@@ -75,7 +75,8 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         get_user_schedule(update.effective_user.id, context)
 
     if selected == "delete":
-        return await query.delete_message()
+        await query.delete_message()
+        return -1
     elif selected == "profile":
         return await send_profile_menu(query.edit_message_text, context)
     await query.edit_message_text(

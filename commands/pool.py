@@ -14,6 +14,7 @@ from data.accounts import ACCOUNTS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
 from keyboards import (
+    CANCEL_KEYBOARD,
     OK_KEYBOARD,
     POOL_KEYBOARD,
     POOL_OPTIONS_KEYBOARD,
@@ -30,13 +31,13 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
     query = update.callback_query
     await query.answer()
     options = query.data.split(":")
-    if len(options) == 1:
-        return await pools_menu(query, update)
-    elif len(options) == 2:
+    if len(options) == 2:
         # generic pool actions
         action = options[1]
         if action == "browse":
             return await browse_public_pools(query, update)
+        if action == "manage":
+            return await browse_own_pools(query, update)
         elif action == "join":
             await query.edit_message_text(
                 text=JOIN_POOL_PROMT,
@@ -52,14 +53,13 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             await query.edit_message_text(
                 text=CREATE_POOL0,
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
-                reply_markup=OK_KEYBOARD,
+                reply_markup=CANCEL_KEYBOARD,
             )
             context.user_data["FORM"] = "POOL"
             context.user_data["POOL"] = {}
             context.user_data["CURRENT_FEATURE"] = "name"
             context.user_data["NEXT_PHASE"] = add_name
             return "TYPING"
-
     elif len(options) > 2:
         # actions for pool -> pool_id
         pool_id = int(options[1])
@@ -141,6 +141,7 @@ async def join_private_pool(message: Message, context: ContextTypes.DEFAULT_TYPE
 async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     await update.message.reply_markdown_v2(
         text=CREATE_POOL0,
+        reply_markup=CANCEL_KEYBOARD,
     )
     context.user_data["FORM"] = "POOL"
     context.user_data["POOL"] = {}
@@ -262,10 +263,22 @@ async def browse_public_pools(query: CallbackQuery, update: Update) -> None:
     )
 
 
+async def browse_own_pools(query: CallbackQuery, update: Update) -> None:
+    pools = POOLS.pools_of(update.effective_user.id)
+    await query.edit_message_text(
+        text=POOL_BROWSE_PUBLIC,
+        reply_markup=POOLS_KEYBOARD(
+            extra=":return:pool_menu:manage", pools_shown=pools
+        ),
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
+    )
+
+
 async def pools_menu(query: CallbackQuery, update: Update) -> None:
+    pools = POOLS.pools_of(update.effective_user.id)
     await query.edit_message_text(
         text=POOL_EXPLANATION,
-        reply_markup=POOL_OPTIONS_KEYBOARD,
+        reply_markup=POOL_OPTIONS_KEYBOARD(len(pools) > 0),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
 

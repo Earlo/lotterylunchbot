@@ -3,6 +3,9 @@ import os
 from datetime import timedelta
 
 from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -28,9 +31,6 @@ from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
 from data.schedules import SCHEDULES
 from utils import time_until
-
-load_dotenv()  # take environment variables from .env.
-
 
 # Enable logging
 logging.basicConfig(

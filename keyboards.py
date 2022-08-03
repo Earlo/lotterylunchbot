@@ -20,6 +20,14 @@ OK_KEYBOARD = InlineKeyboardMarkup(
     ]
 )
 
+CANCEL_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton("Cancel", callback_data="delete"),
+        ],
+    ]
+)
+
 
 HOMEKEYBOARD = InlineKeyboardMarkup(
     [
@@ -80,8 +88,9 @@ RETURN_TO_POOL_MENU_KEYBOARD = InlineKeyboardMarkup(
     ]
 )
 
-POOL_OPTIONS_KEYBOARD = InlineKeyboardMarkup(
-    [
+
+def POOL_OPTIONS_KEYBOARD(has_pools: bool = False) -> InlineKeyboardMarkup:
+    keys = [
         [
             InlineKeyboardButton(
                 text="Browse public pools",
@@ -96,15 +105,33 @@ POOL_OPTIONS_KEYBOARD = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(
-                text="Create a private pool",
+                text="Create a new pool",
                 callback_data="pool_menu:create",
             )
         ],
+        [
+            InlineKeyboardButton(
+                text="Go back",
+                callback_data="profile",
+            )
+        ],
     ]
-)
+    if has_pools:
+        keys.insert(
+            0,
+            [
+                InlineKeyboardButton(
+                    text="Browse your pools",
+                    callback_data="pool_menu:manage",
+                )
+            ],
+        )
+    return InlineKeyboardMarkup(keys)
 
 
-def POOLS_KEYBOARD(extra: str = "") -> InlineKeyboardMarkup:
+def POOLS_KEYBOARD(
+    extra: str = "", pools_shown: list = POOLS.public_pools()
+) -> InlineKeyboardMarkup:
     pool_buttons = list(
         chunks(
             [
@@ -112,7 +139,7 @@ def POOLS_KEYBOARD(extra: str = "") -> InlineKeyboardMarkup:
                     f"View {pool['name']}",
                     callback_data=f"pool_menu:{pool['id']}:view{extra}",
                 )
-                for pool in POOLS.public_pools()
+                for pool in pools_shown
             ],
             3,
         )
