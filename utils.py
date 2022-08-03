@@ -1,5 +1,6 @@
 from asyncio import constants
 from data.accounts import ACCOUNTS
+from data.schedules import SCHEDULES
 
 from messages import *
 
@@ -37,3 +38,9 @@ def time_until(clock: str):
     )
     # return (next_time - now) / 3000
     return next_time - now
+
+
+def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
+    """Returns the schedule of the user."""
+    schedules = SCHEDULES.get_schedule(user_id)
+    context.user_data["CALENDER"] = schedules["calendar"]

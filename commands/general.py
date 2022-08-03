@@ -17,7 +17,7 @@ from keyboards import (
     OK_KEYBOARD,
     POOL_KEYBOARD,
 )
-from commands.utils import requires_account
+from commands.utils import requires_account, get_user_schedule
 
 
 @requires_account
@@ -85,6 +85,8 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     await query.answer()
     options = query.data.split(":")
     selected = options[0]
+    if "CALENDER" not in context.user_data:
+        get_user_schedule(update.effective_user.id, context)
 
     if selected == "delete":
         return await query.delete_message()
@@ -105,6 +107,7 @@ async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def send_profile_menu(reply, account: dict):
     pools_in = POOLS.pools_in(account["id"])
+
     await reply(
         text=OPTIONS.format(
             escape_markdown(account["first_name"], version=2),

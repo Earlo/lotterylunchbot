@@ -24,13 +24,7 @@ from telegram import (
 )
 from telegram.ext import ContextTypes
 
-from commands.utils import requires_account
-
-
-def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
-    """Returns the schedule of the user."""
-    schedules = SCHEDULES.get_schedule(user_id)
-    context.user_data["CALENDER"] = schedules["calendar"]
+from commands.utils import requires_account, get_user_schedule
 
 
 async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
