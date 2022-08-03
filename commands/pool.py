@@ -16,6 +16,7 @@ from data.pools import POOLS
 from keyboards import (
     OK_KEYBOARD,
     POOL_KEYBOARD,
+    POOL_OPTIONS_KEYBOARD,
     POOLS_KEYBOARD,
     SUBMIT_CANCEL_KEYBOARD,
     YES_NO_KEYBOARD,
@@ -30,10 +31,18 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
     options = query.data.split(":")
     if len(options) == 1:
         return await pools_menu(query, update)
-    pool_id = int(options[1])
-    if len(options) > 2:
+    elif len(options) == 2:
+        # generic pool actions
+        action = options[1]
+        if action == "browse":
+            return await browse_public_pools(query, update)
+    elif len(options) > 2:
+        # actions for pool -> pool_id
+        pool_id = int(options[1])
         action = options[2]
-        if action == "join":
+        if action == "view":
+            return await pool_page(query, update, pool_id)
+        elif action == "join":
             POOL_MEMBERS.append(query.from_user.id, pool_id)
         elif action == "leave":
             POOL_MEMBERS.remove_from(query.from_user.id, pool_id)
@@ -55,8 +64,8 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             POOLS.update(pool_id, field, value)
         elif action == "delete":
             del POOLS[pool_id]
-            return await pools_menu(query, update)
-    return await pool_menu(query, update, pool_id)
+            return await browse_public_pools(query, update)
+    return await pools_menu(query, update)
 
 
 @requires_account
@@ -204,17 +213,23 @@ async def check_feature(message: Message, context: ContextTypes.DEFAULT_TYPE) ->
     return "CONFIRM"
 
 
-async def pools_menu(query: CallbackQuery, update: Update) -> None:
+async def browse_public_pools(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
-        text=POOL_OPTIONS.format(
-            escape_markdown(query.from_user.first_name, version=2)
-        ),
-        reply_markup=POOLS_KEYBOARD(query.from_user.id),
+        text=POOL_BROWSE_PUBLIC,
+        reply_markup=POOLS_KEYBOARD(),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
 
 
-async def pool_menu(query: CallbackQuery, update: Update, pool_id: int) -> None:
+async def pools_menu(query: CallbackQuery, update: Update) -> None:
+    await query.edit_message_text(
+        text=POOL_EXPLANATION,
+        reply_markup=POOL_OPTIONS_KEYBOARD,
+        parse_mode=constants.ParseMode.MARKDOWN_V2,
+    )
+
+
+async def pool_page(query: CallbackQuery, update: Update, pool_id: int) -> None:
     user_id = query.from_user.id
     pool = POOLS[pool_id]
     is_member, is_admin, count = POOL_MEMBERS.get_meta(user_id, pool["id"])

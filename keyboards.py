@@ -70,23 +70,46 @@ SUBMIT_CANCEL_KEYBOARD = InlineKeyboardMarkup(
     ]
 )
 
+POOL_OPTIONS_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton(
+                text="Browse public groups",
+                callback_data="pool_menu:browse",
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="Join a private group",
+                callback_data="pool_menu:join",
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                text="Create a private group",
+                callback_data="pool_menu:create",
+            )
+        ],
+    ]
+)
 
-def POOLS_KEYBOARD(account: int) -> InlineKeyboardMarkup:
+
+def POOLS_KEYBOARD() -> InlineKeyboardMarkup:
     pool_buttons = list(
         chunks(
             [
                 InlineKeyboardButton(
                     f"View {pool['name']}",
-                    callback_data=f"pool_menu:{pool['id']}",
+                    callback_data=f"pool_menu:{pool['id']}:view",
                 )
-                for pool in POOLS.availeable_pools(account)
+                for pool in POOLS.public_pools()
             ],
             3,
         )
     )
     pool_buttons.append(
         [
-            InlineKeyboardButton("Back", callback_data="profile"),
+            InlineKeyboardButton("Back", callback_data="pool_menu"),
         ]
     )
     return InlineKeyboardMarkup(pool_buttons)
