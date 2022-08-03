@@ -80,9 +80,12 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return await send_profile_menu(query.edit_message_text, context)
     await query.edit_message_text(
         text=f"""View not implemented yet\.
-        Selected option: {query.data}""",
+        Selected option: {query.data}
+        While state is {context.chat_data.get("state")}
+        You should not see this message. :D please make a bug report at the project's github page.""",
         reply_markup=OPTIONS_KEYBOARD,
     )
+    return -1
 
 
 async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -84,19 +84,19 @@ POOL_OPTIONS_KEYBOARD = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                text="Browse public groups",
+                text="Browse public pools",
                 callback_data="pool_menu:browse",
             )
         ],
         [
             InlineKeyboardButton(
-                text="Join a private group",
+                text="Join a private pool",
                 callback_data="pool_menu:join",
             )
         ],
         [
             InlineKeyboardButton(
-                text="Create a private group",
+                text="Create a private pool",
                 callback_data="pool_menu:create",
             )
         ],

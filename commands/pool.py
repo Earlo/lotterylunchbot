@@ -48,6 +48,18 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             context.user_data["CURRENT_FEATURE"] = "name"
             context.user_data["NEXT_PHASE"] = join_private_pool
             return "TYPING"
+        elif action == "create":
+            await query.edit_message_text(
+                text=CREATE_POOL0,
+                parse_mode=constants.ParseMode.MARKDOWN_V2,
+                reply_markup=OK_KEYBOARD,
+            )
+            context.user_data["FORM"] = "POOL"
+            context.user_data["POOL"] = {}
+            context.user_data["CURRENT_FEATURE"] = "name"
+            context.user_data["NEXT_PHASE"] = add_name
+            return "TYPING"
+
     elif len(options) > 2:
         # actions for pool -> pool_id
         pool_id = int(options[1])
@@ -127,9 +139,8 @@ async def join_private_pool(message: Message, context: ContextTypes.DEFAULT_TYPE
 
 @requires_account
 async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    account = ACCOUNTS[context._user_id]
     await update.message.reply_markdown_v2(
-        text=CREATE_POOL0.format(escape_markdown(account["first_name"], version=2)),
+        text=CREATE_POOL0,
     )
     context.user_data["FORM"] = "POOL"
     context.user_data["POOL"] = {}
@@ -155,19 +166,18 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             return "TYPING"
         else:
             user_data["POOL"]["description"] = ""
+            await query.delete_message()
             return await check(query.message, context)
     elif user_data["CHOICE"] == "submit_pool":
         if DATA == "True":
             pool = POOLS.append(user_data["POOL"])
             POOL_MEMBERS.append(context._user_id, pool["id"], True)
-            await update.callback_query.edit_message_text(
-                text=CREATE_POOL5.format(
-                    escape_markdown(pool["name"], version=2),
-                    escape_markdown(pool["description"], version=2),
-                    pool["public"],
-                ),
+            await pool_page_view(query.edit_message_text, context._user_id, pool)
+        else:
+            await query.edit_message_text(
+                text=CREATE_POOL_CANCEL,
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
-                reply_markup=OK_KEYBOARD,
+                reply_markup=RETURN_TO_POOL_MENU_KEYBOARD,
             )
     elif user_data["CHOICE"] == "submit_pool_edit":
         if user_data["POOL"]["id"]:

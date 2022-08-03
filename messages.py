@@ -47,7 +47,7 @@ Members: {}
 """
 
 
-CREATE_POOL0 = """Hello *{}*,
+CREATE_POOL0 = """Let's create you a new lottery lunch pool\!,
 
 Please enter the name of your pool\.
 """
@@ -67,12 +67,7 @@ Name: {}
 Description: {}
 Public: {}"""
 
-
-CREATE_POOL5 = """Created pool\. 
-
-Name: {}
-Description: {}
-Public: {}"""
+CREATE_POOL_CANCEL = """Pool creation cancelled\."""
 
 EDIT_POOL_DONE = """Edited pool\. 
 
