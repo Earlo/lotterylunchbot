@@ -55,18 +55,11 @@ def main():
             CommandHandler("start", home),
             CommandHandler("skip", skip),
             CommandHandler("debugraffle", debug_raffle_pairs),
-        ],
-        states={},
-        fallbacks=[CommandHandler("start", home)],
-        per_message=False,
-        per_user=True,
-    )
-
-    pool_handler = ConversationHandler(
-        entry_points=[
             CommandHandler("create_pool", create_pool),
             CommandHandler("join", join_pool),
             CallbackQueryHandler(pool_menu_callbacks, pattern="pool_menu"),
+            CallbackQueryHandler(schedule_menu_callbacks, pattern="schedule_menu"),
+            CallbackQueryHandler(inline_menu),
         ],
         states={
             "SELECTING": [CallbackQueryHandler(save_button_input)],
@@ -75,27 +68,15 @@ def main():
             ],
             "CONFIRM": [CallbackQueryHandler(choose)],
         },
-        fallbacks=[CommandHandler("start", home)],
-        per_message=False,
-        per_user=True,
-    )
-
-    schedule_handler = ConversationHandler(
-        entry_points=[
-            CallbackQueryHandler(schedule_menu_callbacks, pattern="schedule_menu"),
+        fallbacks=[
+            CommandHandler("start", home),
+            CallbackQueryHandler(inline_menu),
         ],
-        states={},
-        fallbacks=[CommandHandler("start", home)],
         per_message=False,
         per_user=True,
     )
 
     application.add_handler(conv_handler)
-    application.add_handler(pool_handler)
-
-    application.add_handler(schedule_handler)
-
-    application.add_handler(CallbackQueryHandler(inline_menu))
 
     # log all errors
     application.add_error_handler(error)
