@@ -25,17 +25,17 @@ __You're availeable for lunch on:__
 {}
 """
 
+POOL_EXPLANATION = """The lunch lotteries are conducted in among the pool members\.
+
+Here you can manage the pools you are a member of, and join new ones\.
+
+You can also create your own pool\.
+"""
+
+
 POOL_LIST = """{} *{}* has {}\."""
 
-POOL_OPTIONS = """Hello *{}*,
-Here are the public pools\.
-
-If you've been asked to join a private pool, use 
-`\/join <pool_name>`
-
-To create a new pool use
-`\/create_pool`
-"""
+POOL_BROWSE_PUBLIC = """Click on the pools below to view them\."""
 
 POOL_DESCRIPTION = """*{}*
 _{} _
@@ -47,7 +47,7 @@ Members: {}
 """
 
 
-CREATE_POOL0 = """Hello *{}*,
+CREATE_POOL0 = """Let's create you a new lottery lunch pool\!,
 
 Please enter the name of your pool\.
 """
@@ -67,12 +67,7 @@ Name: {}
 Description: {}
 Public: {}"""
 
-
-CREATE_POOL5 = """Created pool\. 
-
-Name: {}
-Description: {}
-Public: {}"""
+CREATE_POOL_CANCEL = """Pool creation cancelled\."""
 
 EDIT_POOL_DONE = """Edited pool\. 
 
@@ -80,6 +75,8 @@ Name: {}
 Description: {}
 Public: {}"""
 
+
+JOIN_POOL_PROMT = """Enter the pool's name you want to join\."""
 
 JOIN_POOL_FAIL = """Pool named _{} _doesn't exist\."""
 

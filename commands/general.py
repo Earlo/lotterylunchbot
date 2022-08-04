@@ -15,7 +15,8 @@ from utils import check_accounts
 
 @requires_account
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    return await profile_menu(update, context)
+    await profile_menu(update, context)
+    return -1
 
 
 @requires_account
@@ -73,16 +74,20 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     selected = options[0]
     if "CALENDER" not in context.user_data:
         get_user_schedule(update.effective_user.id, context)
-
     if selected == "delete":
-        return await query.delete_message()
+        await query.delete_message()
+        return -1
     elif selected == "profile":
         return await send_profile_menu(query.edit_message_text, context)
+
+    print(context.application.handlers)
     await query.edit_message_text(
         text=f"""View not implemented yet\.
-        Selected option: {query.data}""",
+        Selected option: {query.data}
+        You should not see this message. :D please make a bug report at the project's github page.""",
         reply_markup=OPTIONS_KEYBOARD,
     )
+    return -1
 
 
 async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

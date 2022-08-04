@@ -9,7 +9,7 @@ from singleton import Singleton
 
 class Pools(metaclass=Singleton):
     def __init__(self):
-        pass
+        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
 
     def __setitem__(self, pool_id: int, data):
         with self.con:
@@ -122,6 +122,17 @@ class Pools(metaclass=Singleton):
                 )
                 return cur.fetchall()
 
+    def pools_of(self, account_id: int):
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """SELECT * FROM pools WHERE id IN (
+                        SELECT pool FROM poolMembers WHERE account = %s
+                    );""",
+                    (account_id,),
+                )
+                return cur.fetchall()
+
     def pools_in(self, account_id: int):
         with self.con:
             with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
@@ -139,7 +150,6 @@ class Pools(metaclass=Singleton):
                 return cur.fetchall()
 
     def check_db(self):
-        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
         with self.con:
             with self.con.cursor() as cur:
                 # cur.execute("drop table if exists pools CASCADE;")
