@@ -4,6 +4,7 @@ from telegram import Update, constants
 from telegram.ext import CallbackContext, ContextTypes
 from telegram.helpers import escape_markdown
 
+from commands.pool import pools_menu
 from commands.utils import get_times_string, get_user_schedule, requires_account
 from data.accounts import ACCOUNTS
 from data.pools import POOLS
@@ -66,7 +67,7 @@ async def debug_raffle_pairs(update: Update, context: ContextTypes):
     await raffle_pairs(context)
 
 
-async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     query = update.callback_query
     await query.answer()
@@ -76,17 +77,19 @@ async def inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         get_user_schedule(update.effective_user.id, context)
     if selected == "delete":
         await query.delete_message()
-        return -1
     elif selected == "profile":
-        return await send_profile_menu(query.edit_message_text, context)
-
-    print(context.application.handlers)
-    await query.edit_message_text(
-        text=f"""View not implemented yet\.
-        Selected option: {query.data}
-        You should not see this message. :D please make a bug report at the project's github page.""",
-        reply_markup=OPTIONS_KEYBOARD,
-    )
+        await send_profile_menu(query.edit_message_text, context)
+    elif selected == "cancel":
+        # I don't like this, but egh
+        if options[1] == "pool_menu":
+            await pools_menu(query, update)
+    else:
+        await query.edit_message_text(
+            text=f"""View not implemented yet\.
+            Selected option: {query.data}
+            You should not see this message. :D please make a bug report at the project's github page.""",
+            reply_markup=OPTIONS_KEYBOARD,
+        )
     return -1
 
 

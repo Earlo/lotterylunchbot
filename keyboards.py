@@ -20,10 +20,10 @@ OK_KEYBOARD = InlineKeyboardMarkup(
     ]
 )
 
-CANCEL_KEYBOARD = InlineKeyboardMarkup(
+POOL_CANCEL_KEYBOARD = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("Cancel", callback_data="delete"),
+            InlineKeyboardButton("Cancel", callback_data="cancel:pool_menu"),
         ],
     ]
 )

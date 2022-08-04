@@ -18,7 +18,7 @@ from telegram.ext import (
 from commands.general import (
     debug_raffle_pairs,
     home,
-    inline_menu,
+    meta_inline_menu,
     raffle_pairs,
     remind,
     skip,
@@ -59,7 +59,7 @@ def main():
             CommandHandler("join", join_pool),
             CallbackQueryHandler(pool_menu_callbacks, pattern="pool_menu"),
             CallbackQueryHandler(schedule_menu_callbacks, pattern="schedule_menu"),
-            CallbackQueryHandler(inline_menu),
+            CallbackQueryHandler(meta_inline_menu),
         ],
         states={
             "SELECTING": [CallbackQueryHandler(save_button_input)],
@@ -70,7 +70,7 @@ def main():
         },
         fallbacks=[
             CommandHandler("start", home),
-            CallbackQueryHandler(inline_menu),
+            CallbackQueryHandler(meta_inline_menu),
         ],
         per_message=False,
         per_user=True,

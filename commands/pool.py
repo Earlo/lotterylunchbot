@@ -14,8 +14,8 @@ from data.accounts import ACCOUNTS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
 from keyboards import (
-    CANCEL_KEYBOARD,
     OK_KEYBOARD,
+    POOL_CANCEL_KEYBOARD,
     POOL_KEYBOARD,
     POOL_OPTIONS_KEYBOARD,
     POOLS_KEYBOARD,
@@ -42,7 +42,7 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             await query.edit_message_text(
                 text=JOIN_POOL_PROMT,
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
-                reply_markup=OK_KEYBOARD,
+                reply_markup=POOL_CANCEL_KEYBOARD,
             )
             context.user_data["FORM"] = "JOIN_POOL"
             context.user_data["JOIN_POOL"] = {}
@@ -53,7 +53,7 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             await query.edit_message_text(
                 text=CREATE_POOL0,
                 parse_mode=constants.ParseMode.MARKDOWN_V2,
-                reply_markup=CANCEL_KEYBOARD,
+                reply_markup=POOL_CANCEL_KEYBOARD,
             )
             context.user_data["FORM"] = "POOL"
             context.user_data["POOL"] = {}
@@ -141,7 +141,7 @@ async def join_private_pool(message: Message, context: ContextTypes.DEFAULT_TYPE
 async def create_pool(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     await update.message.reply_markdown_v2(
         text=CREATE_POOL0,
-        reply_markup=CANCEL_KEYBOARD,
+        reply_markup=POOL_CANCEL_KEYBOARD,
     )
     context.user_data["FORM"] = "POOL"
     context.user_data["POOL"] = {}
@@ -281,6 +281,7 @@ async def pools_menu(query: CallbackQuery, update: Update) -> None:
         reply_markup=POOL_OPTIONS_KEYBOARD(len(pools) > 0),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
+    return -1
 
 
 async def pool_page(
