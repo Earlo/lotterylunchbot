@@ -101,16 +101,17 @@ async def send_profile_menu(reply, context: ContextTypes.DEFAULT_TYPE):
     account = ACCOUNTS[context._user_id]
     pools_in = POOLS.pools_in(context._user_id)
 
-    filtered_days = list(
-        filter(lambda column: True in column, context.user_data.get("CALENDER", []))
-    )
     account_schedule = [
         SCHEDULE_MENU_DATE_LINE.format(
             DAYS[day_index],
             get_times_string(column),
         )
-        for day_index, column in enumerate(filtered_days)
+        for day_index, column in enumerate(context.user_data.get("CALENDER", []))
     ]
+
+    account_schedule = list(
+        filter(lambda sched: "No times selected" not in sched, account_schedule)
+    )
     account_pools = [
         POOL_LIST.format(
             "🌐" if p["public"] else "🔐",
