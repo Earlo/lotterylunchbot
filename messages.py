@@ -25,6 +25,10 @@ __You're availeable for lunch on:__
 {}
 """
 
+OPTIONS_AWAY = """Hello *{}*,
+You're not currently taking part in lottery lunches due to having set your status as *away*\."""
+
+
 POOL_EXPLANATION = """The lunch lotteries are conducted in among the pool members\.
 
 Here you can manage the pools you are a member of, and join new ones\.

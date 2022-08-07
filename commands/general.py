@@ -10,7 +10,7 @@ from data.accounts import ACCOUNTS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
 from data.schedules import DAYS, TIMES
-from keyboards import OK_KEYBOARD, OPTIONS_KEYBOARD
+from keyboards import AWAY_KEYBOARD, OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
 
@@ -90,6 +90,13 @@ async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         # I don't like this, but egh
         if options[1] == "pool_menu":
             await pools_menu(query, update)
+    elif selected == "account_menu":
+        if options[1] == "toggle":
+            if options[2] == "disqualified":
+                ACCOUNTS.set_disqualified(
+                    update.effective_user.id, options[3] == "True"
+                )
+        await send_profile_menu(query.edit_message_text, context)
     else:
         await query.edit_message_text(
             text=f"""View not implemented yet\.
@@ -132,12 +139,19 @@ async def send_profile_menu(reply, context: ContextTypes.DEFAULT_TYPE):
     if account_pools == []:
         account_pools = [NO_POOLS_JOINED]
 
-    await reply(
-        text=OPTIONS.format(
-            escape_markdown(account["first_name"], version=2),
-            "\n".join(account_pools),
-            "\n".join(account_schedule),
-        ),
-        reply_markup=OPTIONS_KEYBOARD,
-        parse_mode=constants.ParseMode.MARKDOWN_V2,
-    )
+    if account["disqualified"]:
+        await reply(
+            text=OPTIONS_AWAY.format(escape_markdown(account["first_name"], version=2)),
+            reply_markup=AWAY_KEYBOARD,
+            parse_mode=constants.ParseMode.MARKDOWN_V2,
+        )
+    else:
+        await reply(
+            text=OPTIONS.format(
+                escape_markdown(account["first_name"], version=2),
+                "\n".join(account_pools),
+                "\n".join(account_schedule),
+            ),
+            reply_markup=OPTIONS_KEYBOARD,
+            parse_mode=constants.ParseMode.MARKDOWN_V2,
+        )

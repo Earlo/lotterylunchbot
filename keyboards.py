@@ -44,7 +44,22 @@ OPTIONS_KEYBOARD = InlineKeyboardMarkup(
             InlineKeyboardButton("Manage pools", callback_data="pool_menu"),
             InlineKeyboardButton("Manage schedule", callback_data="schedule_menu"),
         ],
-        [InlineKeyboardButton("Close dialog", callback_data="delete")],
+        [
+            InlineKeyboardButton(
+                "Take a break", callback_data="account_menu:toggle:disqualified:True"
+            )
+        ],
+    ]
+)
+
+AWAY_KEYBOARD = InlineKeyboardMarkup(
+    [
+        [
+            InlineKeyboardButton(
+                "Return from the break",
+                callback_data="account_menu:toggle:disqualified:False",
+            )
+        ],
     ]
 )
 

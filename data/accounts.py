@@ -80,6 +80,14 @@ class Accounts(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
+    def set_disqualified(self, account_id: int, disqualified: bool):
+        with self.con:
+            with self.con.cursor() as cur:
+                cur.execute(
+                    """UPDATE accounts SET disqualified = %s WHERE id = %s""",
+                    (disqualified, account_id),
+                )
+
     def get_qualified(self):
         with self.con:
             with self.con.cursor() as cur:
