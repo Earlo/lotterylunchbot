@@ -41,7 +41,7 @@ HOMEKEYBOARD = InlineKeyboardMarkup(
 OPTIONS_KEYBOARD = InlineKeyboardMarkup(
     [
         [
-            InlineKeyboardButton("Manage pools", callback_data="pool_menu"),
+            InlineKeyboardButton("Manage groups", callback_data="pool_menu"),
             InlineKeyboardButton("Manage schedule", callback_data="schedule_menu"),
         ],
         [
@@ -96,7 +96,7 @@ RETURN_TO_POOL_MENU_KEYBOARD = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                text="Return to pool menu",
+                text="Return to group menu",
                 callback_data="pool_menu",
             ),
         ],
@@ -108,19 +108,19 @@ def POOL_OPTIONS_KEYBOARD(has_pools: bool = False) -> InlineKeyboardMarkup:
     keys = [
         [
             InlineKeyboardButton(
-                text="Browse public pools",
+                text="Browse public groups",
                 callback_data="pool_menu:browse",
             )
         ],
         [
             InlineKeyboardButton(
-                text="Join a private pool",
+                text="Join a private group",
                 callback_data="pool_menu:join",
             )
         ],
         [
             InlineKeyboardButton(
-                text="Create a new pool",
+                text="Create a new group",
                 callback_data="pool_menu:create",
             )
         ],
@@ -136,7 +136,7 @@ def POOL_OPTIONS_KEYBOARD(has_pools: bool = False) -> InlineKeyboardMarkup:
             0,
             [
                 InlineKeyboardButton(
-                    text="Browse your pools",
+                    text="Browse your groups",
                     callback_data="pool_menu:manage",
                 )
             ],

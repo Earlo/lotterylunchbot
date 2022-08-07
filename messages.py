@@ -18,7 +18,7 @@ MISS = """Sorry, you were the odd one out today and we couldn't find you a lunch
 
 
 OPTIONS = """Hello *{}*,
-__You are in lottery pools:__
+__You are in lottery groups:__
 {}
 
 __You're availeable for lunch on:__
@@ -29,17 +29,17 @@ OPTIONS_AWAY = """Hello *{}*,
 You're not currently taking part in lottery lunches due to having set your status as *away*\."""
 
 
-POOL_EXPLANATION = """The lunch lotteries are conducted in among the pool members\.
+POOL_EXPLANATION = """The lunch lotteries are conducted in among the group members\.
 
-Here you can manage the pools you are a member of, and join new ones\.
+Here you can manage the groups you are a member of, and join new ones\.
 
-You can also create your own pool\.
+You can also create your own group\.
 """
 
 
 POOL_LIST = """{} *{}* has {}\."""
 
-POOL_BROWSE_PUBLIC = """Click on the pools below to view them\."""
+POOL_BROWSE_PUBLIC = """Click on the groups below to view them\."""
 
 POOL_DESCRIPTION = """*{}*
 _{} _
@@ -51,52 +51,46 @@ Members: {}
 """
 
 
-CREATE_POOL0 = """Let's create you a new lottery lunch pool\!,
+CREATE_POOL0 = """Let's create you a new lottery lunch group\!,
 
-Please enter the name of your pool\.
+Please enter the name of your group\.
 """
 
 CREATE_POOL1 = """Set name to *{}*,
 
-Do you want your pool to be public or private?"""
+Do you want your group to be public or private?"""
 
 CREATE_POOL2 = """Do you want to add a description?"""
 
-CREATE_POOL3 = """Please type your pool's description\."""
+CREATE_POOL3 = """Please type your group's description\."""
 
 
-CREATE_POOL4 = """Creating pool\. 
-
-Name: {}
-Description: {}
-Public: {}"""
-
-CREATE_POOL_CANCEL = """Pool creation cancelled\."""
-
-EDIT_POOL_DONE = """Edited pool\. 
+CREATE_POOL4 = """Creating group\. 
 
 Name: {}
 Description: {}
 Public: {}"""
 
+CREATE_POOL_CANCEL = """Group creation cancelled\."""
 
-JOIN_POOL_PROMT = """Enter the pool's name you want to join\."""
+JOIN_POOL_PROMT = """Enter the group's name you want to join\."""
 
-JOIN_POOL_FAIL = """Pool named _{} _doesn't exist\."""
+JOIN_POOL_FAIL = """Group named _{} _doesn't exist\."""
 
 JOIN_POOL_ALREADY_MEMBER = """You are already a member of _{}\._"""
 
-JOIN_POOL_SUCCESS = """You have joined pool _{}\._"""
+JOIN_POOL_SUCCESS = """You have joined group _{}\._"""
 
 
-LEAVE_POOL_FAIL = """Pool named _{} _doesn't exist\."""
+LEAVE_POOL_FAIL = """Group named _{} _doesn't exist\."""
 
 LEAVE_POOL_NOT_MEMBER = """You are not a member of _{}\._"""
 
-LEAVE_POOL_SUCCESS = """You have left pool _{}\._"""
+LEAVE_POOL_SUCCESS = """You have left group _{}\._"""
 
-POOL_EDIT = """Please enter the new {} of your pool\."""
+POOL_EDIT = """Please enter the new {} of your group\."""
 
+POOL_EDIT_CONFIRM = """change {} {} to {}?"""
 
 SCHEDULE_MENU = """Schedule for *{}*,
 ```
@@ -116,8 +110,8 @@ You need to have a schedule before you can participate in lunch lotteries\.
 Click 'Manage schedule' to set one\.
 """
 
-NO_POOLS_JOINED = """You haven't joined any pools yet\.
-You need to be a member of a pool before you can participate in lunch lotteries\.
+NO_POOLS_JOINED = """You haven't joined any groups yet\.
+You need to be a member of a group before you can participate in lunch lotteries\.
 
-Click 'Manage pools' to join or create one\.
+Click 'Manage groups' to join or create one\.
 """

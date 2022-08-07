@@ -184,15 +184,7 @@ async def choose(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         if user_data["POOL"]["id"]:
             # Yrjistä :D
             pool = POOLS[user_data["POOL"]["id"]] = user_data["POOL"]
-            await update.callback_query.edit_message_text(
-                text=EDIT_POOL_DONE.format(
-                    escape_markdown(pool["name"], version=2),
-                    escape_markdown(pool["description"], version=2),
-                    pool["public"],
-                ),
-                parse_mode=constants.ParseMode.MARKDOWN_V2,
-                reply_markup=OK_KEYBOARD,
-            )
+            await pool_page_view(query.edit_message_text, context._user_id, pool)
     return -1
 
 
@@ -248,8 +240,16 @@ async def check(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
 
 async def check_feature(message: Message, context: ContextTypes.DEFAULT_TYPE) -> str:
     context.user_data["CHOICE"] = "submit_pool_edit"
+
     await message.reply_markdown_v2(
-        text=f"change {context.user_data['POOL']['name']} {context.user_data['CURRENT_FEATURE']} to {context.user_data['POOL'][context.user_data['CURRENT_FEATURE']]}?",
+        text=escape_markdown(
+            POOL_EDIT_CONFIRM.format(
+                context.user_data["POOL"]["name"],
+                context.user_data["CURRENT_FEATURE"],
+                context.user_data["POOL"][context.user_data["CURRENT_FEATURE"]],
+            ),
+            version=2,
+        ),
         reply_markup=SUBMIT_CANCEL_KEYBOARD,
     )
     return "CONFIRM"
