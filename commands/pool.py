@@ -294,7 +294,6 @@ async def pool_page(
 
 async def pool_page_view(reply, user_id, pool, return_page: str | None = None):
     is_member, is_admin, count = POOL_MEMBERS.get_meta(user_id, pool["id"])
-
     await reply(
         text=POOL_DESCRIPTION.format(
             escape_markdown(pool["name"], version=2),

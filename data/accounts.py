@@ -86,14 +86,6 @@ class Accounts(metaclass=Singleton):
                 cur.execute("""SELECT id FROM accounts WHERE disqualified = FALSE""")
                 return [x[0] for x in cur.fetchall()]
 
-    def get_pairs(self):
-        rngkeys = self.get_qualified()
-        shuffle(rngkeys)
-        if len(rngkeys) % 2 == 1:
-            rngkeys.append(None)
-        pairs = [[rngkeys[x * 2], rngkeys[x * 2 + 1]] for x in range(len(rngkeys) // 2)]
-        return pairs
-
     def reset(self):
         self.disqualified_accounts = set()
 

@@ -32,6 +32,26 @@ class PoolMembers(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
+    def get_pairs(self, day: int, hour: int) -> list:
+        with self.con:
+            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """SELECT a_account, b_account, a_pool FROM 
+                        (SELECT poolMembers.account as a_account, poolMembers.pool as a_pool, calendar as a_calendar
+                            FROM poolMembers JOIN schedules ON poolMembers.account = schedules.account) AS person_a
+                        JOIN
+                        (SELECT poolMembers.account as b_account, poolMembers.pool as b_pool, calendar as b_calendar
+                            FROM poolMembers JOIN schedules ON poolMembers.account = schedules.account) AS person_b
+                        ON a_account != b_account
+                        AND a_account > b_account
+                        AND a_pool = b_pool
+                        AND a_calendar[%s][%s] = TRUE
+                        AND a_calendar[%s][%s] = b_calendar[%s][%s]
+                    """,
+                    (day, hour, day, hour, day, hour),
+                )
+                return cur.fetchall()
+
     def is_member(self, account_id: int, pool_id: int) -> bool:
         with self.con:
             with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:

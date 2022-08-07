@@ -7,8 +7,9 @@ from telegram.helpers import escape_markdown
 from commands.pool import pools_menu
 from commands.utils import get_times_string, get_user_schedule, requires_account
 from data.accounts import ACCOUNTS
+from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
-from data.schedules import DAYS
+from data.schedules import DAYS, TIMES
 from keyboards import OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
@@ -36,7 +37,12 @@ async def remind(context: CallbackContext):
 
 
 async def raffle_pairs(context: CallbackContext):
-    await check_accounts(context)
+    # await check_accounts(context)
+    for di, d in enumerate(DAYS):
+        for ti, i in enumerate(TIMES):
+            pairs = POOL_MEMBERS.get_pairs(ti, di)
+            print(d, i, pairs)
+    """
     for a, b in ACCOUNTS.get_pairs():
         if a == None or b == None:
             try:
@@ -61,6 +67,7 @@ async def raffle_pairs(context: CallbackContext):
                 text=LUNCH.format(escape_markdown(ACCOUNTS[a]["username"], version=2)),
             )
     ACCOUNTS.reset()
+    """
 
 
 async def debug_raffle_pairs(update: Update, context: ContextTypes):
