@@ -1,4 +1,6 @@
+import json
 import os
+from datetime import datetime
 
 from telegram import Update, constants
 from telegram.ext import CallbackContext, ContextTypes
@@ -38,46 +40,60 @@ async def remind(context: CallbackContext):
 
 async def raffle_pairs(context: CallbackContext):
     # await check_accounts(context)
-    for di, d in enumerate(DAYS):
-        pairs = POOL_MEMBERS.get_pairs(di + 1)
-        print(di, d)
-        for pair in pairs:
-            print(
-                pair["a_username"],
-                pair["b_username"],
-                pair["pool_name"],
-                pair["calendar_match"],
-            )
-    """
-    for a, b in ACCOUNTS.get_pairs():
-        if a == None or b == None:
+    # Add one because postgres starts at 1
+    matched = set()
+    day = datetime.now().weekday() + 1
+    print("day is", day)
+    pairs = POOL_MEMBERS.get_pairs(day)
+    for pair in pairs:
+        account_a = pair["a_account"]
+        account_b = pair["b_account"]
+        if account_a in matched or account_b in matched:
+            print("alrayd matched")
+        else:
+            matched.add(account_a)
+            matched.add(account_b)
+            group = escape_markdown(pair["pool_name"], version=2)
+            times = get_times_string(pair["calendar_match"])
             try:
                 await context.bot.send_message(
-                    chat_id=a,
-                    text=MISS,
-                    reply_markup=OK_KEYBOARD,
+                    chat_id=account_a,
+                    text=LUNCH.format(
+                        escape_markdown(pair["b_username"], version=2), group, times
+                    ),
+                    parse_mode=constants.ParseMode.MARKDOWN_V2,
                 )
-            except:
+            except Exception as e:
+                print(e)
+                print(f"most likley {account_a} has unsubscribed")
+                pass
+            try:
                 await context.bot.send_message(
-                    chat_id=b,
-                    text=MISS,
-                    reply_markup=OK_KEYBOARD,
+                    chat_id=account_b,
+                    text=LUNCH.format(
+                        escape_markdown(pair["a_username"], version=2), group, times
+                    ),
+                    parse_mode=constants.ParseMode.MARKDOWN_V2,
                 )
-        else:
-            await context.bot.send_message(
-                chat_id=a,
-                text=LUNCH.format(escape_markdown(ACCOUNTS[b]["username"], version=2)),
-            )
-            await context.bot.send_message(
-                chat_id=b,
-                text=LUNCH.format(escape_markdown(ACCOUNTS[a]["username"], version=2)),
-            )
-    ACCOUNTS.reset()
-    """
+            except Exception as e:
+                print(e)
+                print(f"most likley {account_b} has unsubscribed")
+                pass
 
 
 async def debug_raffle_pairs(update: Update, context: ContextTypes):
-    await raffle_pairs(context)
+    if update.effective_user.id == int(os.environ.get("ADMIN_ACCOUNT_ID")):
+        # await raffle_pairs(context)
+        for di, d in enumerate(DAYS):
+            pairs = POOL_MEMBERS.get_pairs(di + 1)
+            print(di + 1, d)
+            for pair in pairs:
+                print(
+                    pair["a_username"],
+                    pair["b_username"],
+                    pair["pool_name"],
+                    pair["calendar_match"],
+                )
 
 
 async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

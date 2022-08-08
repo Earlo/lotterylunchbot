@@ -37,21 +37,21 @@ class Logs(metaclass=Singleton):
         with self.con:
             with self.con.cursor() as cur:
                 cur.execute(
-                    f"""INSERT INTO log (pairs) VALUES (%s)""", (json.dumps(data),)
+                    f"""INSERT INTO lottery_log (pairs) VALUES (%s)""",
+                    (json.dumps(data),),
                 )
 
     def check_db(self):
         self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
         with self.con:
             with self.con.cursor() as cur:
-                # cur.execute("drop table if exists log;")
+                # cur.execute("drop table if exists lottery_log;")
                 cur.execute(
-                    f"""CREATE TABLE IF NOT EXISTS log (
+                    f"""CREATE TABLE IF NOT EXISTS lottery_log (
                         id serial PRIMARY KEY,
                         date timestamp without time zone NOT NULL DEFAULT now(),
                         pairs json NOT NULL
-                    )
-                );"""
+                    );"""
                 )
 
     def close_connection(self):

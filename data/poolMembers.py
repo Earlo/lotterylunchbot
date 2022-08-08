@@ -54,14 +54,16 @@ class PoolMembers(metaclass=Singleton):
     def get_pairs(self, day: int) -> list:
         with self.con:
             with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute(
-                    f"""SELECT 
+                # the string_to_array(concat_ws is pretty disgusting
+                # But it works.
+                # TODO figure out how to do 2D array OR in postgres
+                query = f"""SELECT 
                             person_a.account as a_account, person_a.username as a_username,
                             person_b.account as b_account, person_b.username as b_username,
                             person_a.pool, person_a.pool_name,
-                            (
+                            string_to_array(concat_ws(',' ,
                                 {', '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
-                            ) as calendar_match
+                            ),',') as calendar_match
                         FROM 
                             ({self.member_calendar_sql}) AS person_a
                         JOIN
@@ -73,7 +75,7 @@ class PoolMembers(metaclass=Singleton):
                             {' OR '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
                         )
                     """
-                )
+                cur.execute(query)
                 return cur.fetchall()
 
     def is_member(self, account_id: int, pool_id: int) -> bool:

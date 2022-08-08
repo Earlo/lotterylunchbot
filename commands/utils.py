@@ -52,7 +52,7 @@ def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["CALENDER"] = schedules["calendar"]
 
 
-def get_times_string(column):
+def get_times_string(column: list):
     """Returns a string of the times in the column."""
     streak = False
     string = ""

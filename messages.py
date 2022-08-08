@@ -12,6 +12,9 @@ REMINDER = """Lunch Lottery is conducted at {}\.
 If you don't want to take part to the next lunch pairing, use `\/skip`\."""
 
 LUNCH = """Today you'll be having lunch with @{}\!
+
+You share the group *{}* and you're both free between *{}*\.
+
 Send them a message\!"""
 
 MISS = """Sorry, you were the odd one out today and we couldn't find you a lunch partner :("""
