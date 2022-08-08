@@ -27,6 +27,7 @@ from commands.pool import choose, create_pool, join_pool, pool_menu_callbacks
 from commands.schedule import schedule_menu_callbacks
 from commands.utils import save_button_input, save_text_input
 from data.accounts import ACCOUNTS
+from data.logs import LOGS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
 from data.schedules import SCHEDULES
@@ -103,6 +104,7 @@ if __name__ == "__main__":
     POOLS.check_db()
     SCHEDULES.check_db()
     POOL_MEMBERS.check_db()
+    LOGS.check_db()
 
     main()
 
@@ -111,3 +113,4 @@ if __name__ == "__main__":
     POOLS.close_connection()
     SCHEDULES.close_connection()
     POOL_MEMBERS.close_connection()
+    LOGS.close_connection()

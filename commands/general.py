@@ -39,9 +39,15 @@ async def remind(context: CallbackContext):
 async def raffle_pairs(context: CallbackContext):
     # await check_accounts(context)
     for di, d in enumerate(DAYS):
-        for ti, i in enumerate(TIMES):
-            pairs = POOL_MEMBERS.get_pairs(ti, di)
-            print(d, i, pairs)
+        pairs = POOL_MEMBERS.get_pairs(di + 1)
+        print(di, d)
+        for pair in pairs:
+            print(
+                pair["a_username"],
+                pair["b_username"],
+                pair["pool_name"],
+                pair["calendar_match"],
+            )
     """
     for a, b in ACCOUNTS.get_pairs():
         if a == None or b == None:

@@ -31,7 +31,6 @@ class Schedules(metaclass=Singleton):
         pass
 
     def __repr__(self) -> str:
-        kek = []
         return str(list(self.__iter__()))
 
     def update_schedule(

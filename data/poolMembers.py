@@ -4,10 +4,29 @@ from datetime import datetime
 import psycopg2
 import psycopg2.extras
 
+from data.schedules import TIMES
 from singleton import Singleton
 
 
 class PoolMembers(metaclass=Singleton):
+
+    member_calendar_sql = """SELECT 
+                                accounts.username, 
+                                poolMembers.account, 
+                                poolMembers.pool,
+                                pools.name as pool_name,
+                                calendar
+                            FROM poolMembers 
+                                JOIN schedules ON poolMembers.account = schedules.account
+                                JOIN accounts ON poolMembers.account = accounts.id
+                                JOIN pools ON poolMembers.pool = pools.id
+                            WHERE accounts.disqualified = FALSE
+                            """
+    calendar_comparisions = [
+        f"person_a.calendar[{{}}][{ti + 1}] AND person_b.calendar[{{}}][{ti + 1}]"
+        for ti, t in enumerate(TIMES)
+    ]
+
     def __init__(self):
         pass
 
@@ -32,23 +51,28 @@ class PoolMembers(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
-    def get_pairs(self, day: int, hour: int) -> list:
+    def get_pairs(self, day: int) -> list:
         with self.con:
             with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute(
-                    """SELECT a_account, b_account, a_pool FROM 
-                        (SELECT poolMembers.account as a_account, poolMembers.pool as a_pool, calendar as a_calendar
-                            FROM poolMembers JOIN schedules ON poolMembers.account = schedules.account) AS person_a
+                    f"""SELECT 
+                            person_a.account as a_account, person_a.username as a_username,
+                            person_b.account as b_account, person_b.username as b_username,
+                            person_a.pool, person_a.pool_name,
+                            (
+                                {', '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
+                            ) as calendar_match
+                        FROM 
+                            ({self.member_calendar_sql}) AS person_a
                         JOIN
-                        (SELECT poolMembers.account as b_account, poolMembers.pool as b_pool, calendar as b_calendar
-                            FROM poolMembers JOIN schedules ON poolMembers.account = schedules.account) AS person_b
-                        ON a_account != b_account
-                        AND a_account > b_account
-                        AND a_pool = b_pool
-                        AND a_calendar[%s][%s] = TRUE
-                        AND a_calendar[%s][%s] = b_calendar[%s][%s]
-                    """,
-                    (day, hour, day, hour, day, hour),
+                            ({self.member_calendar_sql}) AS person_b
+                        ON person_a.account != person_b.account
+                        AND person_a.account > person_b.account
+                        AND person_a.pool = person_b.pool
+                        AND (
+                            {' OR '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
+                        )
+                    """
                 )
                 return cur.fetchall()
 
