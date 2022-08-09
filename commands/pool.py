@@ -1,3 +1,5 @@
+import os
+
 from telegram import (
     CallbackQuery,
     InlineKeyboardButton,
@@ -306,6 +308,11 @@ async def pool_page_view(reply, user_id, pool, return_page: str | None = None):
             if is_member
             else "You're not a member",
         ),
-        reply_markup=POOL_KEYBOARD(pool, is_member, is_admin, return_page),
+        reply_markup=POOL_KEYBOARD(
+            pool,
+            is_member,
+            is_admin or user_id == int(os.environ.get("ADMIN_ACCOUNT_ID")),
+            return_page,
+        ),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
