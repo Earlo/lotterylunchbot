@@ -16,6 +16,7 @@ from telegram.ext import (
 )
 
 from commands.general import (
+    debug_announce,
     debug_raffle_pairs,
     home,
     meta_inline_menu,
@@ -56,6 +57,7 @@ def main():
             CommandHandler("start", home),
             CommandHandler("skip", skip),
             CommandHandler("debugraffle", debug_raffle_pairs),
+            CommandHandler("announce", debug_announce),
             CommandHandler("create_pool", create_pool),
             CommandHandler("join", join_pool),
             CallbackQueryHandler(pool_menu_callbacks, pattern="pool_menu"),
@@ -89,12 +91,12 @@ def main():
         interval=timedelta(days=1),
         first=time_until(os.getenv("REMIND_AT")),
     )
+    """
     application.job_queue.run_repeating(
         callback=raffle_pairs,
         interval=timedelta(days=1),
         first=time_until(os.getenv("LOTTERY_AT")),
     )
-    """
     application.run_polling()
 
 

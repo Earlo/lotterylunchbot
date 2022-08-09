@@ -33,7 +33,7 @@ class Logs(metaclass=Singleton):
     def __repr__(self) -> str:
         return str(list(self.__iter__()))
 
-    def add_entry(self, data: dict):
+    def add_entry(self, data: list):
         with self.con:
             with self.con.cursor() as cur:
                 cur.execute(

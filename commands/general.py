@@ -1,5 +1,5 @@
-import json
 import os
+import random
 from datetime import datetime
 
 from telegram import Update, constants
@@ -9,9 +9,10 @@ from telegram.helpers import escape_markdown
 from commands.pool import pools_menu
 from commands.utils import get_times_string, get_user_schedule, requires_account
 from data.accounts import ACCOUNTS
+from data.logs import LOGS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
-from data.schedules import DAYS, TIMES
+from data.schedules import DAYS
 from keyboards import AWAY_KEYBOARD, OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
@@ -45,6 +46,9 @@ async def raffle_pairs(context: CallbackContext):
     day = datetime.now().weekday() + 1
     print("day is", day)
     pairs = POOL_MEMBERS.get_pairs(day)
+    random.shuffle(pairs)
+    pairs_messaged = []
+    # TODO check that the user is still subscribed before this
     for pair in pairs:
         account_a = pair["a_account"]
         account_b = pair["b_account"]
@@ -65,8 +69,8 @@ async def raffle_pairs(context: CallbackContext):
                 )
             except Exception as e:
                 print(e)
-                print(f"most likley {account_a} has unsubscribed")
-                pass
+                print(f"most likley account_a {account_a} has unsubscribed")
+                break
             try:
                 await context.bot.send_message(
                     chat_id=account_b,
@@ -77,13 +81,15 @@ async def raffle_pairs(context: CallbackContext):
                 )
             except Exception as e:
                 print(e)
-                print(f"most likley {account_b} has unsubscribed")
-                pass
+                print(f"most likley account_b {account_b} has unsubscribed")
+                break
+            pairs_messaged.append(pair)
+    LOGS.add_entry(pairs_messaged)
 
 
 async def debug_raffle_pairs(update: Update, context: ContextTypes):
     if update.effective_user.id == int(os.environ.get("ADMIN_ACCOUNT_ID")):
-        # await raffle_pairs(context)
+        await raffle_pairs(context)
         for di, d in enumerate(DAYS):
             pairs = POOL_MEMBERS.get_pairs(di + 1)
             print(di + 1, d)
@@ -94,6 +100,22 @@ async def debug_raffle_pairs(update: Update, context: ContextTypes):
                     pair["pool_name"],
                     pair["calendar_match"],
                 )
+
+
+async def debug_announce(update: Update, context: ContextTypes):
+    if update.effective_user.id == int(os.environ.get("ADMIN_ACCOUNT_ID")):
+        text = " ".join(update.message.text.split(" ")[1:])
+        print(text)
+        for account in ACCOUNTS:
+            try:
+                await context.bot.send_message(
+                    chat_id=account,
+                    text=text,
+                    parse_mode=constants.ParseMode.MARKDOWN_V2,
+                )
+            except Exception as e:
+                print(e)
+                print(f"most likley {account} has unsubscribed")
 
 
 async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
