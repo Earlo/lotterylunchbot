@@ -110,12 +110,14 @@ async def debug_announce(update: Update, context: ContextTypes):
             try:
                 await context.bot.send_message(
                     chat_id=account,
-                    text=text,
+                    text=escape_markdown(text, version=2),
                     parse_mode=constants.ParseMode.MARKDOWN_V2,
                 )
             except Exception as e:
                 print(e)
                 print(f"most likley {account} has unsubscribed")
+    else:
+        print(update.effective_user.id, " tried to announce:", update.message.text)
 
 
 async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
