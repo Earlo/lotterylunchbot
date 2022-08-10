@@ -32,7 +32,7 @@ OPTIONS_AWAY = """Hello *{}*,
 You're not currently taking part in lottery lunches due to having set your status as *away*\."""
 
 
-POOL_EXPLANATION = """The lunch lotteries are conducted in among the group members\.
+POOL_EXPLANATION = """The lunch lotteries are conducted among the group members\.
 
 Here you can manage the groups you are a member of, and join new ones\.
 
@@ -54,7 +54,7 @@ Members: {}
 """
 
 
-CREATE_POOL0 = """Let's create you a new lottery lunch group\!,
+CREATE_POOL0 = """Let's create you a new lottery lunch group\!
 
 Please enter the name of your group\.
 """
@@ -107,14 +107,16 @@ SCHEDULE_EDIT_INSTRUCTIONS = (
     """Click on the time slots that work for your lunch schedule\."""
 )
 
-NO_SCHEDULE_SET = """You haven't set a schedule yet\.
-You need to have a schedule before you can participate in lunch lotteries\.
-
-Click 'Manage schedule' to set one\.
+NO_SCHEDULE_SET = """Mon: \-
+Tue: \-
+Wed: \-
+Thu: \-
+Fri: \-
+Sat: \-
+Sun: \-
 """
 
-NO_POOLS_JOINED = """You haven't joined any groups yet\.
-You need to be a member of a group before you can participate in lunch lotteries\.
+NO_POOLS_JOINED = """\-
 
-Click 'Manage groups' to join or create one\.
+Please join at least one group to participate in lunch lotteries\.
 """
