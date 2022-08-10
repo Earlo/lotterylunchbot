@@ -1,8 +1,8 @@
 import os
 from datetime import datetime
 
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 
 from data.schedules import TIMES
 from singleton import Singleton
@@ -52,129 +52,113 @@ class PoolMembers(metaclass=Singleton):
         return str(list(self.__iter__()))
 
     def get_pairs(self, day: int) -> list:
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                # the string_to_array(concat_ws is pretty disgusting
-                # But it works.
-                # TODO figure out how to do 2D array OR in postgres
-                query = f"""SELECT 
-                            person_a.account as a_account, person_a.username as a_username,
-                            person_b.account as b_account, person_b.username as b_username,
-                            person_a.pool, person_a.pool_name,
-                            string_to_array(concat_ws(',' ,
-                                {', '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
-                            ),',') as calendar_match
-                        FROM 
-                            ({self.member_calendar_sql}) AS person_a
-                        JOIN
-                            ({self.member_calendar_sql}) AS person_b
-                        ON person_a.account != person_b.account
-                        AND person_a.account > person_b.account
-                        AND person_a.pool = person_b.pool
-                        AND (
-                            {' OR '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
-                        )
-                    """
-                cur.execute(query)
-                return cur.fetchall()
+        # the string_to_array(concat_ws is pretty disgusting
+        # But it works.
+        # TODO figure out how to do 2D array OR in postgres
+        query = f"""SELECT 
+                    person_a.account as a_account, person_a.username as a_username,
+                    person_b.account as b_account, person_b.username as b_username,
+                    person_a.pool, person_a.pool_name,
+                    string_to_array(concat_ws(',' ,
+                        {', '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
+                    ),',') as calendar_match
+                FROM 
+                    ({self.member_calendar_sql}) AS person_a
+                JOIN
+                    ({self.member_calendar_sql}) AS person_b
+                ON person_a.account != person_b.account
+                AND person_a.account > person_b.account
+                AND person_a.pool = person_b.pool
+                AND (
+                    {' OR '.join([comparison.format(day, day) for comparison in self.calendar_comparisions])}
+                )
+            """
+        with self.con.cursor(row_factory=dict_row) as cur:
+            return cur.execute(query).fetchall()
 
     def is_member(self, account_id: int, pool_id: int) -> bool:
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with self.con.cursor(row_factory=dict_row) as cur:
+            return (
                 cur.execute(
                     """SELECT * FROM poolMembers WHERE account = %s AND pool = %s;""",
                     (account_id, pool_id),
-                )
-                return cur.fetchone() is not None
+                ).fetchone()
+                is not None
+            )
 
     def is_admin(self, account_id: int, pool_id: int) -> bool:
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute(
-                    """SELECT admin FROM poolMembers WHERE account = %s AND pool = %s;""",
-                    (account_id, pool_id),
-                )
-                res = cur.fetchone()
-                return res["admin"] if res is not None else False
+        with self.con.cursor(row_factory=dict_row) as cur:
+            res = cur.execute(
+                """SELECT admin FROM poolMembers WHERE account = %s AND pool = %s;""",
+                (account_id, pool_id),
+            ).fetchone()
+            return res["admin"] if res is not None else False
 
     def count(self, pool_id: int) -> int:
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute(
-                    """SELECT COUNT(*) FROM poolMembers WHERE pool = %s;""", (pool_id,)
-                )
-                return cur.fetchone()["count"]
+        with self.con.cursor(row_factory=dict_row) as cur:
+            return cur.execute(
+                """SELECT COUNT(*) FROM poolMembers WHERE pool = %s;""", (pool_id,)
+            ).fetchone()["count"]
 
     def get_meta(self, account_id: int, pool_id: int) -> tuple:
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute(
-                    """SELECT * FROM poolMembers WHERE account = %s AND pool = %s;""",
-                    (account_id, pool_id),
-                )
-                res = cur.fetchone()
-                is_member = res is not None
-
-                cur.execute(
-                    """SELECT COUNT(*) FROM poolMembers WHERE pool = %s;""", (pool_id,)
-                )
-                count = cur.fetchone()["count"]
-                return is_member, res["admin"] if is_member else False, count
+        with self.con.cursor(row_factory=dict_row) as cur:
+            res = cur.execute(
+                """SELECT * FROM poolMembers WHERE account = %s AND pool = %s;""",
+                (account_id, pool_id),
+            ).fetchone()
+            is_member = res is not None
+            count = cur.execute(
+                """SELECT COUNT(*) FROM poolMembers WHERE pool = %s;""", (pool_id,)
+            ).fetchone()["count"]
+            return is_member, res["admin"] if is_member else False, count
 
     def append(self, account: int, pool: int, admin: bool = False):
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                # Check if there is an admin already
-                cur.execute(
-                    """SELECT admin FROM poolMembers WHERE pool = %s;""", (pool,)
-                )
-                res = cur.fetchone()
-                has_admin = res is not None and res["admin"]
-                try:
-                    query = f"""INSERT INTO poolMembers (
+        # Check if there is an admin already
+        with self.con.cursor(row_factory=dict_row) as cur:
+            res = cur.execute(
+                """SELECT admin FROM poolMembers WHERE pool = %s;""", (pool,)
+            ).fetchone()
+            has_admin = res is not None and res["admin"]
+            try:
+                query = f"""INSERT INTO poolMembers (
+                    account,
+                    pool,
+                    admin,
+                    created
+                    ) VALUES (%s, %s, %s, %s) 
+                    RETURNING *;"""
+                return cur.execute(
+                    query,
+                    (
                         account,
                         pool,
-                        admin,
-                        created
-                        ) VALUES (%s, %s, %s, %s) 
-                        RETURNING *;"""
-                    cur.execute(
-                        query,
-                        (
-                            account,
-                            pool,
-                            admin if has_admin else True,
-                            datetime.now(),
-                        ),
-                    )
-                    return cur.fetchone()
-                except psycopg2.IntegrityError:
-                    return None
+                        admin if has_admin else True,
+                        datetime.now(),
+                    ),
+                ).fetchone()
+            except psycopg.IntegrityError:
+                return None
 
     def remove_from(self, account: int, pool: int):
-        with self.con:
-            with self.con.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute(
-                    """DELETE FROM poolMembers WHERE account = %s AND pool = %s RETURNING *;""",
-                    (account, pool),
-                )
-                return cur.fetchone()
+        with self.con.cursor(row_factory=dict_row) as cur:
+            return cur.execute(
+                """DELETE FROM poolMembers WHERE account = %s AND pool = %s RETURNING *;""",
+                (account, pool),
+            ).fetchone()
 
     def check_db(self):
-        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
-        with self.con:
-            with self.con.cursor() as cur:
-                # cur.execute("drop table if exists poolMembers CASCADE;")
-                cur.execute(
-                    """CREATE TABLE IF NOT EXISTS poolMembers (
-                    account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
-                    pool INTEGER REFERENCES pools(id) ON DELETE CASCADE,
-                    admin BOOLEAN DEFAULT FALSE,
-                    created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    CONSTRAINT unique_account_pool UNIQUE (account, pool),
-                    PRIMARY KEY (account, pool)
-                );"""
-                )
+        self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
+        # self.con.execute("drop table if exists poolMembers CASCADE;")
+        self.con.execute(
+            """CREATE TABLE IF NOT EXISTS poolMembers (
+            account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
+            pool INTEGER REFERENCES pools(id) ON DELETE CASCADE,
+            admin BOOLEAN DEFAULT FALSE,
+            created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT unique_account_pool UNIQUE (account, pool),
+            PRIMARY KEY (account, pool)
+        );"""
+        )
 
     def close_connection(self):
         print("closing pool_members")

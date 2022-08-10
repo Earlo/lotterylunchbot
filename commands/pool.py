@@ -260,7 +260,9 @@ async def check_feature(message: Message, context: ContextTypes.DEFAULT_TYPE) ->
 async def browse_public_pools(query: CallbackQuery, update: Update) -> None:
     await query.edit_message_text(
         text=POOL_BROWSE_PUBLIC,
-        reply_markup=POOLS_KEYBOARD(extra=":return:pool_menu:browse"),
+        reply_markup=POOLS_KEYBOARD(
+            extra=":return:pool_menu:browse", pools_shown=POOLS.public_pools()
+        ),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
     )
 

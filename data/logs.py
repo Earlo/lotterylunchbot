@@ -1,9 +1,8 @@
 import json
 import os
 
-import psycopg2
-import psycopg2.extensions
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 
 from singleton import Singleton
 
@@ -34,25 +33,21 @@ class Logs(metaclass=Singleton):
         return str(list(self.__iter__()))
 
     def add_entry(self, data: list):
-        with self.con:
-            with self.con.cursor() as cur:
-                cur.execute(
-                    f"""INSERT INTO lottery_log (pairs) VALUES (%s)""",
-                    (json.dumps(data),),
-                )
+        self.con.execute(
+            f"""INSERT INTO lottery_log (pairs) VALUES (%s)""",
+            (json.dumps(data),),
+        )
 
     def check_db(self):
-        self.con = psycopg2.connect(os.environ.get("DATABASE_URL"))
-        with self.con:
-            with self.con.cursor() as cur:
-                # cur.execute("drop table if exists lottery_log;")
-                cur.execute(
-                    f"""CREATE TABLE IF NOT EXISTS lottery_log (
-                        id serial PRIMARY KEY,
-                        date timestamp without time zone NOT NULL DEFAULT now(),
-                        pairs json NOT NULL
-                    );"""
-                )
+        self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
+        # self.con.execute("drop table if exists lottery_log;")
+        self.con.execute(
+            f"""CREATE TABLE IF NOT EXISTS lottery_log (
+                id serial PRIMARY KEY,
+                date timestamp without time zone NOT NULL DEFAULT now(),
+                pairs json NOT NULL
+            );"""
+        )
 
     def close_connection(self):
         print("closing logs")

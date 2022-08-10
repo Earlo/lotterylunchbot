@@ -1,6 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from data.pools import POOLS
 from data.schedules import DAYS, TIMES
 from utils import chunks
 
@@ -144,9 +143,7 @@ def POOL_OPTIONS_KEYBOARD(has_pools: bool = False) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keys)
 
 
-def POOLS_KEYBOARD(
-    extra: str = "", pools_shown: list = POOLS.public_pools()
-) -> InlineKeyboardMarkup:
+def POOLS_KEYBOARD(extra: str = "", pools_shown: list = []) -> InlineKeyboardMarkup:
     pool_buttons = list(
         chunks(
             [
