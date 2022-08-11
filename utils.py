@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+import os
+from datetime import datetime, timedelta, tzinfo
+from zoneinfo import ZoneInfo
 
 from telegram.ext import ContextTypes
 
@@ -26,7 +28,7 @@ def time_until(clock: str):
     Returns the amount of time it takes until it's the clock time.
     """
     h, m = clock.split(":")
-    now = datetime.now()
+    now = datetime.now(ZoneInfo(os.getenv("TIMEZONE")))
     tomorrow = now + timedelta(days=1)
     next_time = (
         tomorrow.hour < int(h)
