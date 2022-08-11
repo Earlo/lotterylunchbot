@@ -58,7 +58,7 @@ async def raffle_pairs(context: CallbackContext):
             matched.add(account_a)
             matched.add(account_b)
             group = escape_markdown(pair["pool_name"], version=2)
-            times = get_times_string(pair["calendar_match"])
+            times = get_times_string([t == "t" for t in pair["calendar_match"]])
             try:
                 await context.bot.send_message(
                     chat_id=account_a,
@@ -88,8 +88,10 @@ async def raffle_pairs(context: CallbackContext):
 
 
 async def debug_raffle_pairs(update: Update, context: ContextTypes):
-    if update.effective_user.id == int(os.environ.get("ADMIN_ACCOUNT_ID")):
-        await raffle_pairs(context)
+    if os.environ.get("PRODUCTION") == "False" and update.effective_user.id == int(
+        os.environ.get("ADMIN_ACCOUNT_ID")
+    ):
+        # await raffle_pairs(context)
         for di, d in enumerate(DAYS):
             pairs = POOL_MEMBERS.get_pairs(di + 1)
             print(di + 1, d)
@@ -99,6 +101,7 @@ async def debug_raffle_pairs(update: Update, context: ContextTypes):
                     pair["b_username"],
                     pair["pool_name"],
                     pair["calendar_match"],
+                    get_times_string([t == "t" for t in pair["calendar_match"]]),
                 )
 
 
