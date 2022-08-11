@@ -4,7 +4,7 @@ from telegram.helpers import escape_markdown
 
 from commands.account import register_account
 from data.accounts import ACCOUNTS
-from data.schedules import END_TIMES, SCHEDULES, TIMES
+from data.schedules import END_TIMES, TIMES
 
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
@@ -44,12 +44,6 @@ def requires_account(func):
             return await register_account(update, context)
 
     return wrapper
-
-
-def get_user_schedule(user_id, context: ContextTypes.DEFAULT_TYPE):
-    """Returns the schedule of the user."""
-    schedules = SCHEDULES.get_schedule(user_id)
-    context.user_data["CALENDER"] = schedules["calendar"]
 
 
 def get_times_string(column: list):

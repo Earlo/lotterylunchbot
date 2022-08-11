@@ -7,12 +7,12 @@ from telegram.ext import CallbackContext, ContextTypes
 from telegram.helpers import escape_markdown
 
 from commands.pool import pools_menu
-from commands.utils import get_times_string, get_user_schedule, requires_account
+from commands.utils import get_times_string, requires_account
 from data.accounts import ACCOUNTS
 from data.logs import LOGS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
-from data.schedules import DAYS
+from data.schedules import DAYS, SCHEDULES
 from keyboards import AWAY_KEYBOARD, OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
@@ -130,7 +130,8 @@ async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     options = query.data.split(":")
     selected = options[0]
     if "CALENDER" not in context.user_data:
-        get_user_schedule(update.effective_user.id, context)
+        schedules = SCHEDULES.get_schedule(update.effective_user.id)
+        context.user_data["CALENDER"] = schedules["calendar"]
     if selected == "delete":
         await query.delete_message()
     elif selected == "profile":

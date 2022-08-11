@@ -3,7 +3,6 @@ from telegram.ext import ContextTypes
 from telegram.helpers import escape_markdown
 
 from commands.general import send_profile_menu
-from commands.utils import get_user_schedule
 from data.schedules import SCHEDULES
 from keyboards import TIME_KEYBOARD
 from messages import *
@@ -12,7 +11,8 @@ from messages import *
 async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Parses the CallbackQuery and updates the message text."""
     if "CALENDER" not in context.user_data:
-        get_user_schedule(update.effective_user.id, context)
+        schedules = SCHEDULES.get_schedule(update.effective_user.id)
+        context.user_data["CALENDER"] = schedules["calendar"]
     if "MENU_OFFSET" not in context.user_data:
         context.user_data["MENU_OFFSET"] = 0
 
