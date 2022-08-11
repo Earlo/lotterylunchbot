@@ -135,7 +135,6 @@ class Pools(metaclass=Singleton):
 
     def check_db(self):
         self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
-        print("self.con", self.con)
         # self.con.execute("drop table if exists pools CASCADE;")
         self.con.execute(
             """CREATE TABLE IF NOT EXISTS pools (

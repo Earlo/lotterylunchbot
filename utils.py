@@ -34,6 +34,7 @@ def time_until(clock: str):
         or tomorrow.replace(hour=int(h), minute=int(m), second=0, microsecond=0)
     )
     # return (next_time - now) / 3000
+    print("next time: {}".format(next_time - now))
     return next_time - now
 
 
