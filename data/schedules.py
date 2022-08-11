@@ -4,6 +4,7 @@ import os
 import psycopg
 from psycopg.rows import dict_row
 
+from constants import DAYS, TIMES
 from singleton import Singleton
 
 
@@ -89,26 +90,3 @@ class Schedules(metaclass=Singleton):
 
 
 SCHEDULES = Schedules()
-DAYS = [
-    "Mo",
-    "Tu",
-    "We",
-    "Th",
-    "Fr",
-    "Sa",
-    "Su",
-]
-TIMES = [
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-]
-
-END_TIMES = [
-    "11:00",
-    "12:00",
-    "13:00",
-    "14:00",
-    "15:00",
-]

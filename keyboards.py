@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from data.schedules import DAYS, TIMES
+from constants import DAYS, TIMES
 from utils import chunks
 
 CLEANUP = InlineKeyboardMarkup(

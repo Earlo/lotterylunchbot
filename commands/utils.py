@@ -3,8 +3,8 @@ from telegram.ext import ContextTypes
 from telegram.helpers import escape_markdown
 
 from commands.account import register_account
+from constants import END_TIMES, TIMES
 from data.accounts import ACCOUNTS
-from data.schedules import END_TIMES, TIMES
 
 
 async def save_text_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:

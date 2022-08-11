@@ -4,7 +4,7 @@ from datetime import datetime
 import psycopg
 from psycopg.rows import dict_row
 
-from data.schedules import TIMES
+from constants import TIMES
 from singleton import Singleton
 
 

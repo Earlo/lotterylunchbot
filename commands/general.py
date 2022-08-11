@@ -8,11 +8,12 @@ from telegram.helpers import escape_markdown
 
 from commands.pool import pools_menu
 from commands.utils import get_times_string, requires_account
+from constants import DAYS
 from data.accounts import ACCOUNTS
 from data.logs import LOGS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
-from data.schedules import DAYS, SCHEDULES
+from data.schedules import SCHEDULES
 from keyboards import AWAY_KEYBOARD, OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts

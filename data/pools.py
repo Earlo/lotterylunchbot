@@ -4,7 +4,7 @@ from datetime import datetime
 import psycopg
 from psycopg.rows import dict_row
 
-from singleton import Singleton, run_and_get
+from singleton import Singleton
 
 
 class Pools(metaclass=Singleton):
