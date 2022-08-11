@@ -9,7 +9,7 @@ from singleton import Singleton, run_and_get
 
 class Pools(metaclass=Singleton):
     def __init__(self):
-        pass
+        self.con = psycopg.connect(os.environ.get("DATABASE_URL"), autocommit=True)
 
     def __setitem__(self, pool_id: int, data):
         with self.con.cursor(row_factory=dict_row) as cur:
@@ -134,7 +134,6 @@ class Pools(metaclass=Singleton):
             ).fetchall()
 
     def check_db(self):
-        self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
         # self.con.execute("drop table if exists pools CASCADE;")
         self.con.execute(
             """CREATE TABLE IF NOT EXISTS pools (

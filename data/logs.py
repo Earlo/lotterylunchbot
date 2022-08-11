@@ -9,7 +9,7 @@ from singleton import Singleton
 
 class Logs(metaclass=Singleton):
     def __init__(self):
-        pass
+        self.con = psycopg.connect(os.environ.get("DATABASE_URL"), autocommit=True)
 
     def __setitem__(self, schedule_id: int, data):
         pass
@@ -39,7 +39,6 @@ class Logs(metaclass=Singleton):
         )
 
     def check_db(self):
-        self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
         # self.con.execute("drop table if exists lottery_log;")
         self.con.execute(
             f"""CREATE TABLE IF NOT EXISTS lottery_log (

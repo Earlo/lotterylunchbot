@@ -9,7 +9,7 @@ from singleton import Singleton
 
 class Schedules(metaclass=Singleton):
     def __init__(self):
-        pass
+        self.con = psycopg.connect(os.environ.get("DATABASE_URL"), autocommit=True)
 
     def __setitem__(self, schedule_id: int, data):
         pass
@@ -66,7 +66,6 @@ class Schedules(metaclass=Singleton):
             ).fetchone()
 
     def check_db(self):
-        self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
         # self.con.execute("drop table if exists schedules;")
         date_table = (
             json.dumps([[False for _ in range(len(TIMES))] for _ in range(len(DAYS))])

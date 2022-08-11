@@ -11,7 +11,7 @@ from singleton import Singleton
 
 class Accounts(metaclass=Singleton):
     def __init__(self):
-        pass
+        self.con = psycopg.connect(os.environ.get("DATABASE_URL"), autocommit=True)
 
     def create_account(self, account_id: int, data):
         with self.con.cursor() as cur:
@@ -94,7 +94,6 @@ class Accounts(metaclass=Singleton):
         pass
 
     def check_db(self):
-        self.con = psycopg.connect(os.environ.get("DATABASE_URL"))
         # self.con.execute("drop table if exists accounts cascade")
         self.con.execute(
             """CREATE TABLE IF NOT EXISTS accounts (
