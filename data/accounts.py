@@ -94,7 +94,6 @@ class Accounts(metaclass=Singleton):
         pass
 
     def check_db(self):
-        # self.con.execute("drop table if exists accounts cascade")
         self.con.execute(
             """CREATE TABLE IF NOT EXISTS accounts (
             id INTEGER PRIMARY KEY,

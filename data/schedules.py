@@ -67,7 +67,6 @@ class Schedules(metaclass=Singleton):
             ).fetchone()
 
     def check_db(self):
-        # self.con.execute("drop table if exists schedules;")
         date_table = (
             json.dumps([[False for _ in range(len(TIMES))] for _ in range(len(DAYS))])
             .replace("[", "{")

@@ -134,7 +134,6 @@ class Pools(metaclass=Singleton):
             ).fetchall()
 
     def check_db(self):
-        # self.con.execute("drop table if exists pools CASCADE;")
         self.con.execute(
             """CREATE TABLE IF NOT EXISTS pools (
             id SERIAL PRIMARY KEY,

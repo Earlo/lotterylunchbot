@@ -39,7 +39,6 @@ class Logs(metaclass=Singleton):
         )
 
     def check_db(self):
-        # self.con.execute("drop table if exists lottery_log;")
         self.con.execute(
             f"""CREATE TABLE IF NOT EXISTS lottery_log (
                 id serial PRIMARY KEY,

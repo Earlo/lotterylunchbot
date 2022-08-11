@@ -147,7 +147,6 @@ class PoolMembers(metaclass=Singleton):
             ).fetchone()
 
     def check_db(self):
-        # self.con.execute("drop table if exists poolMembers CASCADE;")
         self.con.execute(
             """CREATE TABLE IF NOT EXISTS poolMembers (
             account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
