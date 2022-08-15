@@ -37,12 +37,13 @@ class Schedules(metaclass=Singleton):
         self, account_id: int, calendar: list, pool_id: int | None = None
     ):
         date_table = json.dumps(calendar).replace("[", "{").replace("]", "}")
-        self.con.execute(
-            """UPDATE schedules
+        ret = self.con.execute(
+            f"""UPDATE schedules
             SET calendar = %s
-            WHERE account = %s""",
+            WHERE account = %s AND {pool_id is not None and f'pool = {pool_id}' or 'pool IS NULL'}""",
             (date_table, account_id),
         )
+        print("ret", ret)
 
     def create_schedule(self, account_id: int, pool_id: int | None = None):
         with self.con.cursor() as cur:
@@ -55,16 +56,17 @@ class Schedules(metaclass=Singleton):
         pool_id: int | None = None,
     ):
         cur.execute(
-            "INSERT INTO schedules (account, pool) VALUES (%s, %s)",
+            "INSERT INTO schedules (account, pool) VALUES (%s, %s) RETURNING *",
             (account_id, pool_id),
         )
 
-    def get_schedule(self, user_id: int) -> dict:
+    def get_schedule(self, account_id: int, pool_id: int | None = None) -> dict:
         with self.con.cursor(row_factory=dict_row) as cur:
-            return cur.execute(
-                "SELECT calendar FROM schedules WHERE account = %s",
-                (user_id,),
-            ).fetchone()
+            query = f"SELECT * FROM schedules WHERE account = {account_id} AND {pool_id is not None and f'pool = {pool_id}' or 'pool IS NULL'}"
+            value = cur.execute(query).fetchone()
+            if value is None:
+                return self.create_schedule_query(cur, account_id, pool_id)
+            return value
 
     def check_db(self):
         date_table = (
@@ -72,6 +74,7 @@ class Schedules(metaclass=Singleton):
             .replace("[", "{")
             .replace("]", "}")
         )
+        self.con.execute("ALTER TABLE schedules DROP CONSTRAINT schedules_pkey;")
         self.con.execute(
             f"""CREATE TABLE IF NOT EXISTS schedules (
             account INTEGER PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,

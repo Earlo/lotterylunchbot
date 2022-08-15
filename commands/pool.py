@@ -11,10 +11,12 @@ from telegram import (
 from telegram.ext import ContextTypes
 from telegram.helpers import escape_markdown
 
+from commands.schedule import calendar_screen
 from commands.utils import requires_account
 from data.accounts import ACCOUNTS
 from data.poolMembers import POOL_MEMBERS
 from data.pools import POOLS
+from data.schedules import SCHEDULES
 from keyboards import (
     OK_KEYBOARD,
     POOL_CANCEL_KEYBOARD,
@@ -88,6 +90,16 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             context.user_data["CURRENT_FEATURE"] = target
             context.user_data["NEXT_PHASE"] = check_feature
             return "TYPING"
+        elif action == "schedule":
+            if "CALENDER" not in context.user_data:
+                schedules = SCHEDULES.get_schedule(update.effective_user.id, pool_id)
+                context.user_data["CALENDER"] = schedules["calendar"]
+            if "MENU_OFFSET" not in context.user_data:
+                context.user_data["MENU_OFFSET"] = 0
+            print("with", options[:3])
+            return await calendar_screen(
+                query, context, pool_id, options[3:], pool_page_view, pool_id=pool_id
+            )
         elif action == "toggle":
             field = options[3]
             value = options[4]

@@ -12,16 +12,17 @@ from constants import DAYS
 from data.accounts import ACCOUNTS
 from data.logs import LOGS
 from data.poolMembers import POOL_MEMBERS
-from data.pools import POOLS
 from data.schedules import SCHEDULES
-from keyboards import AWAY_KEYBOARD, OK_KEYBOARD, OPTIONS_KEYBOARD
+from keyboards import OK_KEYBOARD, OPTIONS_KEYBOARD
 from messages import *
 from utils import check_accounts
+from views.profile.view_profile import view_profile
 
 
 @requires_account
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await profile_menu(update, context)
+    print("asd")
+    await view_profile(update.message.reply_text, context)
     return -1
 
 
@@ -129,25 +130,25 @@ async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     query = update.callback_query
     await query.answer()
     options = query.data.split(":")
+    print(options)
     selected = options[0]
     if "CALENDER" not in context.user_data:
         schedules = SCHEDULES.get_schedule(update.effective_user.id)
         context.user_data["CALENDER"] = schedules["calendar"]
     if selected == "delete":
-        await query.delete_message()
-    elif selected == "profile":
-        await send_profile_menu(query.edit_message_text, context)
+        return await query.delete_message()
     elif selected == "cancel":
         # I don't like this, but egh
         if options[1] == "pool_menu":
-            await pools_menu(query, update)
+            return await pools_menu(query, update)
     elif selected == "account_menu":
         if options[1] == "toggle":
             if options[2] == "disqualified":
                 ACCOUNTS.set_disqualified(
                     update.effective_user.id, options[3] == "True"
                 )
-        await send_profile_menu(query.edit_message_text, context)
+    return await view_profile(query.edit_message_text, context)
+    '''        
     else:
         await query.edit_message_text(
             text=f"""View not implemented yet\.
@@ -155,54 +156,4 @@ async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             You should not see this message. :D please make a bug report at the project's github page.""",
             reply_markup=OPTIONS_KEYBOARD,
         )
-    return -1
-
-
-async def profile_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await send_profile_menu(update.message.reply_text, context)
-
-
-async def send_profile_menu(reply, context: ContextTypes.DEFAULT_TYPE):
-    account = ACCOUNTS[context._user_id]
-    pools_in = POOLS.pools_in(context._user_id)
-
-    account_schedule = [
-        SCHEDULE_MENU_DATE_LINE.format(
-            DAYS[day_index],
-            get_times_string(column),
-        )
-        for day_index, column in enumerate(context.user_data.get("CALENDER", []))
-    ]
-
-    account_schedule = list(
-        filter(lambda sched: "No times selected" not in sched, account_schedule)
-    )
-    account_pools = [
-        POOL_LIST.format(
-            "🌐" if p["public"] else "🔐",
-            escape_markdown(p["name"], version=2),
-            f"{p['member_count']} members" if p["member_count"] > 1 else "Just you 😔",
-        )
-        for p in pools_in
-    ]
-    if account_schedule == []:
-        account_schedule = [NO_SCHEDULE_SET]
-    if account_pools == []:
-        account_pools = [NO_POOLS_JOINED]
-
-    if account["disqualified"]:
-        await reply(
-            text=OPTIONS_AWAY.format(escape_markdown(account["first_name"], version=2)),
-            reply_markup=AWAY_KEYBOARD,
-            parse_mode=constants.ParseMode.MARKDOWN_V2,
-        )
-    else:
-        await reply(
-            text=OPTIONS.format(
-                escape_markdown(account["first_name"], version=2),
-                "\n".join(account_pools),
-                "\n".join(account_schedule),
-            ),
-            reply_markup=OPTIONS_KEYBOARD,
-            parse_mode=constants.ParseMode.MARKDOWN_V2,
-        )
+    '''

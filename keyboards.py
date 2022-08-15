@@ -1,6 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from constants import DAYS, TIMES
 from utils import chunks
 
 CLEANUP = InlineKeyboardMarkup(
@@ -201,6 +200,14 @@ def POOL_KEYBOARD(
             else [],
             [
                 InlineKeyboardButton(
+                    f"Set your schedule for {pool['name']}",
+                    callback_data=f"pool_menu:{pool['id']}:schedule",
+                )
+            ]
+            if is_member
+            else [],
+            [
+                InlineKeyboardButton(
                     "Back",
                     callback_data=return_page
                     if return_page is not None
@@ -209,34 +216,3 @@ def POOL_KEYBOARD(
             ],
         ]
     )
-
-
-def TIME_KEYBOARD(offset: int, calendar: list):
-    width = 3
-    day_grid = [
-        [
-            InlineKeyboardButton(
-                f"{'✅'if calendar[di +  offset][ti] else ''} {d} {t}",
-                callback_data=f"schedule_menu:toggle:{di +  offset}-{ti}",
-            )
-            for di, d in enumerate(DAYS[offset : width + offset])
-        ]
-        for ti, t in enumerate(TIMES)
-    ]
-    arrows = []
-    if offset > 0:
-        arrows.append(
-            InlineKeyboardButton("⬅️", callback_data=f"schedule_menu:move:{offset - 1}")
-        )
-    if offset + width < len(DAYS):
-        arrows.append(
-            InlineKeyboardButton("➡️", callback_data=f"schedule_menu:move:{offset + 1}")
-        )
-    day_grid.append(arrows)
-    day_grid.append(
-        [
-            InlineKeyboardButton("Save changes", callback_data="schedule_menu:save"),
-        ],
-    )
-
-    return InlineKeyboardMarkup(day_grid)

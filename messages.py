@@ -20,18 +20,6 @@ Send them a message\!"""
 MISS = """Sorry, you were the odd one out today and we couldn't find you a lunch partner :("""
 
 
-OPTIONS = """Hello *{}*,
-__You are in lottery groups:__
-{}
-
-__You're availeable for lunch on:__
-{}
-"""
-
-OPTIONS_AWAY = """Hello *{}*,
-You're not currently taking part in lottery lunches due to having set your status as *away*\."""
-
-
 POOL_EXPLANATION = """The lunch lotteries are conducted among the group members\.
 
 Here you can manage the groups you are a member of, and join new ones\.
@@ -39,8 +27,6 @@ Here you can manage the groups you are a member of, and join new ones\.
 You can also create your own group\.
 """
 
-
-POOL_LIST = """{} *{}* has {}\."""
 
 POOL_BROWSE_PUBLIC = """Click on the groups below to view them\."""
 
@@ -99,24 +85,4 @@ SCHEDULE_MENU = """Schedule for *{}*,
 ```
 {}
 ```
-"""
-
-SCHEDULE_MENU_DATE_LINE = """{}: {}"""
-
-SCHEDULE_EDIT_INSTRUCTIONS = (
-    """Click on the time slots that work for your lunch schedule\."""
-)
-
-NO_SCHEDULE_SET = """Mon: \-
-Tue: \-
-Wed: \-
-Thu: \-
-Fri: \-
-Sat: \-
-Sun: \-
-"""
-
-NO_POOLS_JOINED = """\-
-
-Please join at least one group to participate in lunch lotteries\.
 """

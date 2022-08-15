@@ -1,11 +1,10 @@
-from telegram import CallbackQuery, Update, constants
+from telegram import CallbackQuery, Update
 from telegram.ext import ContextTypes
-from telegram.helpers import escape_markdown
 
-from commands.general import send_profile_menu
 from data.schedules import SCHEDULES
-from keyboards import TIME_KEYBOARD
 from messages import *
+from views.profile.view_profile import view_profile
+from views.schedule.view_schedule import view_schedule
 
 
 async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -19,38 +18,29 @@ async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_
     query = update.callback_query
     await query.answer()
     options = query.data.split(":")
-    if len(options) == 1:
-        await query.edit_message_text(
-            text=SCHEDULE_EDIT_INSTRUCTIONS,
-            parse_mode=constants.ParseMode.MARKDOWN_V2,
-            reply_markup=TIME_KEYBOARD(
-                context.user_data["MENU_OFFSET"], context.user_data["CALENDER"]
-            ),
-        )
-    elif options[1] == "move":
-        context.user_data["MENU_OFFSET"] = int(options[2])
-        await query.edit_message_text(
-            text=SCHEDULE_EDIT_INSTRUCTIONS,
-            parse_mode=constants.ParseMode.MARKDOWN_V2,
-            reply_markup=TIME_KEYBOARD(
-                context.user_data["MENU_OFFSET"], context.user_data["CALENDER"]
-            ),
-        )
-    elif options[1] == "toggle":
-        day_index, time_index = map(int, options[2].split("-"))
+    await calendar_screen(query, context, options[1:], view_profile)
+
+
+async def calendar_screen(
+    query: CallbackQuery,
+    context: ContextTypes.DEFAULT_TYPE,
+    options: list,
+    on_save: callable,
+    pool_id: int | None = None,
+):
+    print("calendar screen options", options)
+    if len(options) == 0:
+        pass
+    elif options[0] == "move":
+        context.user_data["MENU_OFFSET"] = int(options[1])
+    elif options[0] == "toggle":
+        day_index, time_index = map(int, options[1].split("-"))
         context.user_data["CALENDER"][day_index][time_index] = not context.user_data[
             "CALENDER"
         ][day_index][time_index]
-        await query.edit_message_text(
-            text=SCHEDULE_EDIT_INSTRUCTIONS,
-            parse_mode=constants.ParseMode.MARKDOWN_V2,
-            reply_markup=TIME_KEYBOARD(
-                context.user_data["MENU_OFFSET"], context.user_data["CALENDER"]
-            ),
-        )
-    elif options[1] == "save":
+    elif options[0] == "save":
         SCHEDULES.update_schedule(
-            update.effective_user.id, context.user_data["CALENDER"]
+            query.from_user.id, context.user_data["CALENDER"], pool_id
         )
-        return await send_profile_menu(query.edit_message_text, context)
-    return -1
+        return await on_save(query.edit_message_text, context)
+    return await view_schedule(query.edit_message_text, context)
