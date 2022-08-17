@@ -74,10 +74,10 @@ class Schedules(metaclass=Singleton):
             .replace("[", "{")
             .replace("]", "}")
         )
-        self.con.execute("ALTER TABLE schedules DROP CONSTRAINT schedules_pkey;")
         self.con.execute(
             f"""CREATE TABLE IF NOT EXISTS schedules (
-            account INTEGER PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+            id SERIAL PRIMARY KEY,
+            account INTEGER REFERENCES accounts(id) ON DELETE CASCADE,
             pool INTEGER REFERENCES pools(id) ON DELETE CASCADE,
             calendar BOOLEAN[{len(DAYS)}][{len(TIMES)}] NOT NULL DEFAULT '{date_table}'::BOOLEAN[{len(DAYS)}][{len(TIMES)}],
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
