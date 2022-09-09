@@ -21,7 +21,6 @@ from views.profile.view_profile import view_profile
 
 @requires_account
 async def home(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print("asd")
     await view_profile(update.message.reply_text, context)
     return -1
 
