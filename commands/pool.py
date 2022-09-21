@@ -35,6 +35,7 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
     query = update.callback_query
     await query.answer()
     options = query.data.split(":")
+    print("tions", options)
     if len(options) == 2:
         # generic pool actions
         action = options[1]
@@ -91,15 +92,25 @@ async def pool_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE
             context.user_data["NEXT_PHASE"] = check_feature
             return "TYPING"
         elif action == "schedule":
-            if "CALENDER" not in context.user_data:
+            print("context.user_data:", context.user_data)
+            if (
+                "CALENDER" not in context.user_data
+                or context.user_data["CALENDER_POOL"] != pool_id
+            ):
                 schedules = SCHEDULES.get_schedule(update.effective_user.id, pool_id)
                 context.user_data["CALENDER"] = schedules["calendar"]
+                context.user_data["CALENDER_POOL"] = pool_id
             if "MENU_OFFSET" not in context.user_data:
                 context.user_data["MENU_OFFSET"] = 0
-            print("with", options[:3])
-            return await calendar_screen(
-                query, context, pool_id, options[3:], pool_page_view, pool_id=pool_id
+            print("with", options[3:], pool_id)
+
+            callback = lambda reply_method, context: pool_page_view(
+                reply_method, query.from_user.id, POOLS[pool_id]
             )
+            await calendar_screen(
+                query, context, options[3:], callback, pool_id=pool_id
+            )
+            return -1
         elif action == "toggle":
             field = options[3]
             value = options[4]
@@ -308,9 +319,30 @@ async def pool_page(
     )
 
 
-async def pool_page_view(reply, user_id, pool, return_page: str | None = None):
+async def pool_page_view(
+    reply_method: callable, user_id: int, pool, return_page: str | None = None
+):
+    print("pool page viewing", reply_method, user_id, pool, return_page)
+    print("user_id, poolid", user_id, pool["id"])
     is_member, is_admin, count = POOL_MEMBERS.get_meta(user_id, pool["id"])
-    await reply(
+    print("got meta", is_member, is_admin, count)
+    print("name", pool["name"])
+    print("description", pool["description"])
+    print("public", pool["public"])
+
+    text = POOL_DESCRIPTION.format(
+        escape_markdown(pool["name"], version=2),
+        escape_markdown(pool["description"], version=2),
+        "The group is public\." if pool["public"] else "The group is private\.",
+        count,
+        "You're the admin"
+        if is_admin
+        else "You're a member"
+        if is_member
+        else "You're not a member",
+    )
+    print("pool text", text)
+    await reply_method(
         text=POOL_DESCRIPTION.format(
             escape_markdown(pool["name"], version=2),
             escape_markdown(pool["description"], version=2),

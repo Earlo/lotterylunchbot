@@ -9,9 +9,13 @@ from views.schedule.view_schedule import view_schedule
 
 async def schedule_menu_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Parses the CallbackQuery and updates the message text."""
-    if "CALENDER" not in context.user_data:
+    if (
+        "CALENDER" not in context.user_data
+        or context.user_data["CALENDER_POOL"] is not None
+    ):
         schedules = SCHEDULES.get_schedule(update.effective_user.id)
         context.user_data["CALENDER"] = schedules["calendar"]
+        context.user_data["CALENDER_POOL"] = None
     if "MENU_OFFSET" not in context.user_data:
         context.user_data["MENU_OFFSET"] = 0
 
@@ -42,5 +46,13 @@ async def calendar_screen(
         SCHEDULES.update_schedule(
             query.from_user.id, context.user_data["CALENDER"], pool_id
         )
+        print("onsave", on_save)
         return await on_save(query.edit_message_text, context)
-    return await view_schedule(query.edit_message_text, context)
+
+    return await view_schedule(
+        query.edit_message_text,
+        context,
+        callback_str="schedule_menu"
+        if pool_id is None
+        else f"pool_menu:{pool_id}:schedule",
+    )

@@ -33,7 +33,7 @@ __You're availeable for lunch on:__
 {}"""
 
 
-async def view_profile(reply, context: ContextTypes.DEFAULT_TYPE):
+async def view_profile(reply_method: callable, context: ContextTypes.DEFAULT_TYPE):
     account = ACCOUNTS[context._user_id]
     pools_in = POOLS.pools_in(context._user_id)
 
@@ -62,13 +62,13 @@ async def view_profile(reply, context: ContextTypes.DEFAULT_TYPE):
         account_pools = [NO_POOLS_JOINED]
 
     if account["disqualified"]:
-        await reply(
+        await reply_method(
             text=OPTIONS_AWAY.format(escape_markdown(account["first_name"], version=2)),
             reply_markup=AWAY_KEYBOARD,
             parse_mode=constants.ParseMode.MARKDOWN_V2,
         )
     else:
-        await reply(
+        await reply_method(
             text=OPTIONS.format(
                 escape_markdown(account["first_name"], version=2),
                 "\n".join(account_pools),

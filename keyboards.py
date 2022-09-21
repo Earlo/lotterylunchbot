@@ -166,6 +166,7 @@ def POOLS_KEYBOARD(extra: str = "", pools_shown: list = []) -> InlineKeyboardMar
 def POOL_KEYBOARD(
     pool: dict, is_member: bool, is_admin: bool, return_page: str | None = None
 ) -> InlineKeyboardMarkup:
+    print("doing ppol keyboartd", pool, is_member, is_admin, return_page)
     return InlineKeyboardMarkup(
         [
             [
