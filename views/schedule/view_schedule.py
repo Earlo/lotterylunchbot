@@ -48,6 +48,8 @@ SCHEDULE_EDIT_INSTRUCTIONS = (
     """Click on the time slots that work for your lunch schedule\."""
 )
 
+POOL_SCHEDULE_EDIT_INSTRUCTIONS = """\n You're editing your schedule for pool *{}*\."""
+
 
 async def view_schedule(
     reply_method: callable,
@@ -55,7 +57,10 @@ async def view_schedule(
     callback_str: str = "schedule_menu",
 ):
     return await reply_method(
-        text=SCHEDULE_EDIT_INSTRUCTIONS,
+        text=SCHEDULE_EDIT_INSTRUCTIONS
+        if context.user_data["CALENDER_POOL"] is None
+        else SCHEDULE_EDIT_INSTRUCTIONS
+        + POOL_SCHEDULE_EDIT_INSTRUCTIONS.format(context.user_data["CALENDER_POOL"]),
         parse_mode=constants.ParseMode.MARKDOWN_V2,
         reply_markup=TIME_KEYBOARD(
             context.user_data["MENU_OFFSET"],

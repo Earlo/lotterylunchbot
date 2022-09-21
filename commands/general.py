@@ -13,7 +13,7 @@ from data.accounts import ACCOUNTS
 from data.logs import LOGS
 from data.poolMembers import POOL_MEMBERS
 from data.schedules import SCHEDULES
-from keyboards import OK_KEYBOARD, OPTIONS_KEYBOARD
+from keyboards import OK_KEYBOARD
 from messages import *
 from utils import check_accounts
 from views.profile.view_profile import view_profile
@@ -109,7 +109,7 @@ async def debug_raffle_pairs(update: Update, context: ContextTypes):
 async def debug_announce(update: Update, context: ContextTypes):
     if update.effective_user.id == int(os.environ.get("ADMIN_ACCOUNT_ID")):
         text = " ".join(update.message.text.split(" ")[1:])
-        print(text)
+        print("annnounce", text)
         for account in ACCOUNTS:
             try:
                 await context.bot.send_message(
@@ -129,11 +129,15 @@ async def meta_inline_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     query = update.callback_query
     await query.answer()
     options = query.data.split(":")
-    print(options)
+    print("meta inline options", options)
     selected = options[0]
-    if "CALENDER" not in context.user_data:
+    if (
+        "CALENDER" not in context.user_data
+        or context.user_data["CALENDER_POOL"] is not None
+    ):
         schedules = SCHEDULES.get_schedule(update.effective_user.id)
         context.user_data["CALENDER"] = schedules["calendar"]
+        context.user_data["CALENDER_POOL"] = None
     if selected == "delete":
         return await query.delete_message()
     elif selected == "cancel":
