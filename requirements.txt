@@ -1,4 +1,4 @@
 python-telegram-bot==20.0a2
-python-dotenv==0.20.0
+python-dotenv==1.2.2
 SQLAlchemy==1.4.39
 psycopg==3.0.16 
